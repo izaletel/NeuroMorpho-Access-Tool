@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from tkinter import *
-from ttkwidgets.autocomplete import AutocompleteCombobox
+from tkinter import ttk
 from acquisition import acquisition
 from config import *
 
@@ -32,19 +32,19 @@ if __name__ == "__main__":
     bottomframe = Frame(window, width=400,height=660,borderwidth=1,relief=RIDGE)
     bottomframe.grid(row = 1, column = 0, sticky = W, pady = 2)
 
-    brain_region_menu = AutocompleteCombobox(master=frame, width=20, completevalues=brain_regions)
+    brain_region_menu = ttk.Combobox(master=frame, width=20, values=brain_regions)
     brain_region_menu.set(brain_regions[0])
     brain_region_label = Label(frame, text="Brain Region:")
     brain_region_menu.grid(row = 0, column = 1, sticky = W, pady = 2)
     brain_region_label.grid(row = 0, column = 0, sticky = W, pady = 2)
 
-    species_choice_menu = AutocompleteCombobox(master=frame, width=20, completevalues=species_all)
+    species_choice_menu = ttk.Combobox(master=frame, width=20, values=species_all)
     species_choice_menu.set(species_all[0])
     species_choice_label = Label(frame, text="Species:")
     species_choice_menu.grid(row = 1, column = 1, sticky = W, pady = 2)
     species_choice_label.grid(row = 1, column = 0, sticky = W, pady = 2)
 
-    cell_type_choice_menu = AutocompleteCombobox(master=frame, width=20, completevalues=cell_types)
+    cell_type_choice_menu = ttk.Combobox(master=frame, width=20, values=cell_types)
     cell_type_choice_menu.set(cell_types[0])
     cell_type_choice_label = Label(frame, text="Cell Type:")
     cell_type_choice_menu.grid(row = 2, column = 1, sticky = W, pady = 2)

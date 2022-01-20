@@ -1,78 +1,66 @@
 # -*- coding: utf-8 -*-
 
 from tkinter import *
+from ttkwidgets.autocomplete import AutocompleteCombobox
 from acquisition import acquisition
-
-brain_regions = [
-    'All', 'abdominal ganglion', 'accessory lobe', 'accessory olfactory bulb',
-    'adult subesophageal zone', 'amygdala', 'antenna', 'antennal lobe', 'anterior olfactory nucleus',
-    'basal forbrain', 'basal ganglia', 'brainstem', 'Central complex', 'Central nervous system',
-    'cerebellum', 'cerebral ganglion', 'Cochlea', 'corpus callosum', 'cortex', 'electrosensory lobe',
-    'endocrine system', 'enthorinal cortex', 'eye circuit', 'forebrain', 'fornix', 'ganglion',
-    'hippocampus', 'hypothalamus', 'lateral complex', 'lateral horn', 'lateral line organ', 'left',
-    'Left Adult Central Complex', 'Left Mushroom Body', 'main olfactory bulb', 'meninges', 'mesencephalon',
-    'myelencephalon', 'neocortex', 'nuchal organs', 'olfactory cortex', 'olfactory pit', 'optic lobe',
-    'pallium', 'parasubiculum', ' peptidergic circuit', 'peripheral nervous system',
-    'pharyngeal nervous system', 'pons', 'Pro-subiculum', 'protocerebrum', 'retina',
-    'retinorecipient mesencephalon and diencephalon', 'Right Adult Central Complex', 'Right Mushroom Body',
-    'somatic nervous system', 'spinal cord', 'stomatogastric ganglion', 'subesophageal ganglion',
-    'subesophageal zone-(SEZ)', 'subiculum', 'subpallium', 'Subventricular zone', 'thalamus',
-    'ventral nerve cord', 'ventral striatum', 'ventral thalamus', 'ventrolateral neuropils'
-]
-
-#    value='hippocampus', description='Brain Region:')
-
-species_all = [
-    'All', 'African wild dog', 'agouti', 'Apis mellifera', 'Aplysia', 'Axolotl', 'Baboon',
-    'Blind mole-rat', 'blowfly', 'Blue wildebeest', 'Bonobo', 'bottlenose dolphin', 'C. elegans',
-    'Calango lizard', 'capuchin monkey', 'Caracal', 'cat', 'cheetah', 'chicken', 'chimpanzee', 'Clam worm',
-    'clouded leopard', 'Crab', 'cricket',
-    'Crisia eburnea', 'Domestic dog', 'domestic pig', 'dragonfly', 'drosophila melanogaster',
-    'drosophila sechellia',
-    'elephant', 'ferret', 'giraffe', 'goldfish', 'grasshopper', 'Greater kudu', 'guinea pig', 'Hamster', 'human',
-    'humpback whale',
-    'Lemur', 'leopard', 'Lion', 'locust', 'manatee', 'minke whale', 'Mongoose', 'monkey', 'Mormyrid fish',
-    'moth',
-    'mouse', 'pouched lamprey', 'Praying mantis (Hierodula membranacea)',
-    'Praying mantis (Hierodula membranacea)',
-    'proechimys', 'rabbit', 'Rana esculenta', 'Ranitomeya imitator', 'rat', 'Rhinella arenarum',
-    'Ruddy turnstone', 'salamander',
-    'Scinax granulatus', 'Sea lamprey', 'Semipalmated plover', 'Semipalmated sandpiper', 'sheep', 'Silkmoth',
-    'spiny lobster', 'Stellers Sculpin',
-    'Tiger', 'Toadfish', 'Treeshrew', 'turtle', 'Wallaby', 'Xenopus laevis', 'Xenopus tropicalis', 'Zebra',
-    'zebra finch', 'zebrafish'
-]
-# value='mouse', description='Animal:')
+from config import *
 
 
-cell_types = ['All', 'Glia', 'interneuron', 'principal cell', 'sensory']
+
+def decorator(func):
+    def inner(inputStr):
+        try:
+            text.insert(INSERT, inputStr)
+            text.see(END)
+            text.update_idletasks()
+            return func(inputStr)
+        except:
+            return func(inputStr)
+    return inner
+
+sys.stdout.write=decorator(sys.stdout.write)
 
 
-window = Tk()
-window.title('Combobox')
-window.geometry('500x250')
+if __name__ == "__main__":
+    window = Tk()
+    window.title('NeuroMorpho Access Tool')
+    window.geometry('800x600')
 
-brain_region_choice = StringVar(window)
-brain_region_choice.set(brain_regions[0])
-brain_region_menu = OptionMenu(window, brain_region_choice, *brain_regions)
-brain_region_menu.pack()
+    frame = Frame(window, width=400,height=660,borderwidth=1,relief=RIDGE)
+    frame.grid(row = 0, column = 0, sticky = W, pady = 2)
 
-species_choice = StringVar(window)
-species_choice.set(species_all[0])
-species_choice_menu = OptionMenu(window, species_choice, *species_all)
-species_choice_menu.pack()
+    bottomframe = Frame(window, width=400,height=660,borderwidth=1,relief=RIDGE)
+    bottomframe.grid(row = 1, column = 0, sticky = W, pady = 2)
 
-cell_type_choice = StringVar(window)
-cell_type_choice.set(cell_types[0])
-cell_type_choice_menu = OptionMenu(window, cell_type_choice, *cell_types)
-cell_type_choice_menu.pack()
+    brain_region_menu = AutocompleteCombobox(master=frame, width=20, completevalues=brain_regions)
+    brain_region_menu.set(brain_regions[0])
+    brain_region_label = Label(frame, text="Brain Region:")
+    brain_region_menu.grid(row = 0, column = 1, sticky = W, pady = 2)
+    brain_region_label.grid(row = 0, column = 0, sticky = W, pady = 2)
 
+    species_choice_menu = AutocompleteCombobox(master=frame, width=20, completevalues=species_all)
+    species_choice_menu.set(species_all[0])
+    species_choice_label = Label(frame, text="Species:")
+    species_choice_menu.grid(row = 1, column = 1, sticky = W, pady = 2)
+    species_choice_label.grid(row = 1, column = 0, sticky = W, pady = 2)
 
-button = Button(
-    master=window,
-    text="Execute",
-    command=lambda: acquisition(brain_region_choice.get(), species_choice.get(), cell_type_choice.get())
-)
-button.pack()
+    cell_type_choice_menu = AutocompleteCombobox(master=frame, width=20, completevalues=cell_types)
+    cell_type_choice_menu.set(cell_types[0])
+    cell_type_choice_label = Label(frame, text="Cell Type:")
+    cell_type_choice_menu.grid(row = 2, column = 1, sticky = W, pady = 2)
+    cell_type_choice_label.grid(row = 2, column = 0, sticky = W, pady = 2)
 
-window.mainloop()
+    execute_button = Button(
+        master=bottomframe,
+        text="Execute",
+        command=lambda: acquisition(brain_region_menu.get(), species_choice_menu.get(), cell_type_choice_menu.get())
+    )
+    execute_button.pack()
+
+    text = Text(bottomframe, height=25, width=100)
+    text.pack()
+
+    exit_button = Button(bottomframe, text="Quit", command=window.destroy)
+    exit_button.pack()
+
+    window.mainloop()

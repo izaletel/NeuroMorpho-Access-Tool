@@ -38,14 +38,14 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
 
     first_page_response = requests.get(url, params)
 
-    print(first_page_response.request.url)
-    print(first_page_response.request.body)
-    print(first_page_response.request.headers)
+    #print(first_page_response.request.url)
+    #print(first_page_response.request.body)
+    #print(first_page_response.request.headers)
 
     if first_page_response.status_code == 404 or first_page_response.status_code == 500:
         exit(1)
 
-    print(first_page_response.json())
+    #print(first_page_response.json())
     totalPages = first_page_response.json()['page']['totalPages']
 
     df_dict = {
@@ -91,6 +91,7 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
         'Reference DOI': list(),
         'Physical Integrity': list()}
 
+    print("Getting Neurons")
     for pageNum in range(totalPages):
         params['page'] = pageNum
         response = requests.get(url, params)
@@ -141,20 +142,23 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
                 df_dict['Reference DOI'].append(str(row['reference_doi']))
                 df_dict['Physical Integrity'].append(str(row['physical_Integrity']))
 
+    print("Creating neuron Data Frame")
     neurons_df = pd.DataFrame(df_dict)
-
+    print("Pickling neurons")
     neurons_df.to_pickle("./neurons.pkl")
 
     # the ID number of previously obtained neurons is used to obtain their morphometric details
 
     n = neurons_df['NeuronID'].to_numpy()
+
+    print("Getting morphometry")
     morphometry = []
     for i in n:
         url = "http://neuromorpho.org/api/morphometry/id/" + str(i)
         response = requests.get(url)
         json_data = response.json()
         morphometry.append(json_data)
-
+    print("Creating morphometry Data Frame")
     df_dict = {}
     df_dict['Neuron ID'] = []
     df_dict['Surface'] = []
@@ -203,6 +207,7 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
         df_dict['Length'].append(str(row['length']))
         morphometry_df = pd.DataFrame(df_dict)
 
+    print("Pickling morphometry")
     morphometry_df.to_pickle("./morphometry.pkl")
 
     # the following is a list of steps used to currate the morphometric data
@@ -212,7 +217,7 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
     neurons = open("morphometry.pkl", "rb")
     neurons_df = pickle.load(neurons)
     neurons.close()
-    neurons_df
+    print(neurons_df)
 
     neurons_df = neurons_df.replace({'Soma surface': {'None': ''}}, regex=True)
 
@@ -244,15 +249,14 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
     neurons = open("neurons.pkl", "rb")
     neurons_id_df = pickle.load(neurons)
     neurons.close()
-    neurons_id_df
+    print(neurons_id_df)
 
     neuron_morphometry = open("neurons_float.pkl", "rb")
     neuron_morphometry_df = pickle.load(neuron_morphometry)
     neuron_morphometry.close()
-    neuron_morphometry_df
+    print(neuron_morphometry_df)
 
     final_df = neurons_id_df.join(neuron_morphometry_df)
-    final_df
 
     # excess NeuronID column left when joinging two dataframes
     final_df = final_df.drop(columns=['NeuronID'])
@@ -262,3 +266,7 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
     final_df.to_pickle(file_name)
 
     final_df.to_csv(file_name, index=False)
+
+    print(final_df)
+    print("DONE!")
+

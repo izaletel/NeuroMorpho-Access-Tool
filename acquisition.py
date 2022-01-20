@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 import pickle
+import os
 
 
 def acquisition(brain_region='All', species='All', cell_type='All'):
@@ -145,7 +146,8 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
     print("Creating neuron Data Frame")
     neurons_df = pd.DataFrame(df_dict)
     print("Pickling neurons")
-    neurons_df.to_pickle("./neurons.pkl")
+    os.mkdir("./output")
+    neurons_df.to_pickle("./output/neurons.pkl")
 
     # the ID number of previously obtained neurons is used to obtain their morphometric details
 
@@ -208,13 +210,13 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
         morphometry_df = pd.DataFrame(df_dict)
 
     print("Pickling morphometry")
-    morphometry_df.to_pickle("./morphometry.pkl")
+    morphometry_df.to_pickle("./output/morphometry.pkl")
 
     # the following is a list of steps used to currate the morphometric data
     # and merge the two obtained dataframes (general neuron parameters and morphometric data)
     # this results in the creation of final .pkl and .csv files at the end of the notebook
 
-    neurons = open("morphometry.pkl", "rb")
+    neurons = open("./output/morphometry.pkl", "rb")
     neurons_df = pickle.load(neurons)
     neurons.close()
     print(neurons_df)
@@ -244,14 +246,14 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
     neurons_df["Bifurcation angle remote"] = pd.to_numeric(neurons_df["Bifurcation angle remote"], downcast="float")
     neurons_df["Length"] = pd.to_numeric(neurons_df["Length"], downcast="float")
 
-    neurons_df.to_pickle("./neurons_float.pkl")
+    neurons_df.to_pickle("./output/neurons_float.pkl")
 
-    neurons = open("neurons.pkl", "rb")
+    neurons = open("./output/neurons.pkl", "rb")
     neurons_id_df = pickle.load(neurons)
     neurons.close()
     print(neurons_id_df)
 
-    neuron_morphometry = open("neurons_float.pkl", "rb")
+    neuron_morphometry = open("./output/neurons_float.pkl", "rb")
     neuron_morphometry_df = pickle.load(neuron_morphometry)
     neuron_morphometry.close()
     print(neuron_morphometry_df)
@@ -261,7 +263,7 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
     # excess NeuronID column left when joinging two dataframes
     final_df = final_df.drop(columns=['NeuronID'])
 
-    file_name = "NM_" + str(brain_region) + "_" + str(species) + "_" + str(cell_type) + ".csv"
+    file_name = "./output/NM_" + str(brain_region) + "_" + str(species) + "_" + str(cell_type) + ".csv"
 
     final_df.to_pickle(file_name)
 

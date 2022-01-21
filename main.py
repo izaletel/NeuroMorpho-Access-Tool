@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
 from tkinter import *
 from tkinter import ttk
 from acquisition import acquisition
 from config import *
-
 
 
 def decorator(func):
@@ -18,8 +19,8 @@ def decorator(func):
             return func(inputStr)
     return inner
 
-sys.stdout.write=decorator(sys.stdout.write)
 
+sys.stdout.write=decorator(sys.stdout.write)
 
 if __name__ == "__main__":
     window = Tk()

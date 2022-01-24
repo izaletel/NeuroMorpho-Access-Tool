@@ -2,9 +2,17 @@ import requests
 import pandas as pd
 import pickle
 import os
+import threading
+
+from tkinter import *
 
 
-def acquisition(brain_region='All', species='All', cell_type='All'):
+def acquisition_thread(progress_var, brain_region='All', species='All', cell_type='All'):
+    th = threading.Thread(target=acquisition, args=(progress_var, brain_region, species, cell_type))
+    th.start()
+
+
+def acquisition(progress_var, brain_region='All', species='All', cell_type='All'):
     params_widg = {}
     if brain_region != 'All':
         params_widg['brain_region'] = 'brain_region:' + brain_region
@@ -13,12 +21,14 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
     if cell_type != 'All':
         params_widg['cell_type'] = 'cell_type:' + cell_type
 
+    progress_var.set(0.0)
     print(brain_region)
     print(species)
     print(cell_type)
 
     params = {}
     params['page'] = 0
+    params['size'] = 500
     fq = []
     first = 0
     for key, value in params_widg.items():
@@ -39,14 +49,9 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
 
     first_page_response = requests.get(url, params)
 
-    #print(first_page_response.request.url)
-    #print(first_page_response.request.body)
-    #print(first_page_response.request.headers)
-
     if first_page_response.status_code == 404 or first_page_response.status_code == 500:
         exit(1)
 
-    #print(first_page_response.json())
     totalPages = first_page_response.json()['page']['totalPages']
 
     df_dict = {
@@ -92,7 +97,8 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
         'Reference DOI': list(),
         'Physical Integrity': list()}
 
-    print("Getting Neurons")
+    print("Getting Neurons - total pages:" + str(totalPages))
+    progress_step = 20.0/totalPages
     for pageNum in range(totalPages):
         params['page'] = pageNum
         response = requests.get(url, params)
@@ -142,12 +148,16 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
                 df_dict['Reference PMID'].append(str(row['reference_pmid']))
                 df_dict['Reference DOI'].append(str(row['reference_doi']))
                 df_dict['Physical Integrity'].append(str(row['physical_Integrity']))
+        progress_var.set(pageNum * progress_step)
+    progress_var.set(20)
 
     print("Creating neuron Data Frame")
     neurons_df = pd.DataFrame(df_dict)
+    progress_var.set(25)
     print("Pickling neurons")
-    os.mkdir("./output")
+    os.makedirs("./output", exist_ok=True)
     neurons_df.to_pickle("./output/neurons.pkl")
+    progress_var.set(30)
 
     # the ID number of previously obtained neurons is used to obtain their morphometric details
 
@@ -155,11 +165,17 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
 
     print("Getting morphometry")
     morphometry = []
+    progress_step = 40.0 / n.size
+    progress_value = 0.0
     for i in n:
         url = "http://neuromorpho.org/api/morphometry/id/" + str(i)
         response = requests.get(url)
         json_data = response.json()
         morphometry.append(json_data)
+        progress_value += progress_step
+        progress_var.set(30 + progress_value)
+        print('Querying page {} -> status code: {}'.format(str(i), response.status_code))
+    progress_var.set(70)
     print("Creating morphometry Data Frame")
     df_dict = {}
     df_dict['Neuron ID'] = []
@@ -209,6 +225,8 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
         df_dict['Length'].append(str(row['length']))
         morphometry_df = pd.DataFrame(df_dict)
 
+    progress_var.set(75)
+
     print("Pickling morphometry")
     morphometry_df.to_pickle("./output/morphometry.pkl")
 
@@ -219,6 +237,7 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
     neurons = open("./output/morphometry.pkl", "rb")
     neurons_df = pickle.load(neurons)
     neurons.close()
+    progress_var.set(80)
     print(neurons_df)
 
     neurons_df = neurons_df.replace({'Soma surface': {'None': ''}}, regex=True)
@@ -251,11 +270,13 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
     neurons = open("./output/neurons.pkl", "rb")
     neurons_id_df = pickle.load(neurons)
     neurons.close()
+    progress_var.set(85)
     print(neurons_id_df)
 
     neuron_morphometry = open("./output/neurons_float.pkl", "rb")
     neuron_morphometry_df = pickle.load(neuron_morphometry)
     neuron_morphometry.close()
+    progress_var.set(90)
     print(neuron_morphometry_df)
 
     final_df = neurons_id_df.join(neuron_morphometry_df)
@@ -269,6 +290,7 @@ def acquisition(brain_region='All', species='All', cell_type='All'):
 
     final_df.to_csv(file_name, index=False)
 
+    progress_var.set(100)
     print(final_df)
     print("DONE!")
 

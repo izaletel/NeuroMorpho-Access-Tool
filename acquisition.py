@@ -3,6 +3,7 @@ import pandas as pd
 import pickle
 import os
 import threading
+import datetime
 
 from tkinter import *
 
@@ -13,6 +14,8 @@ def acquisition_thread(progress_var, brain_region='All', species='All', cell_typ
 
 
 def acquisition(progress_var, brain_region='All', species='All', cell_type='All'):
+    starttime = datetime.datetime.now()
+    s = requests.Session()
     params_widg = {}
     if brain_region != 'All':
         params_widg['brain_region'] = 'brain_region:' + brain_region
@@ -47,7 +50,7 @@ def acquisition(progress_var, brain_region='All', species='All', cell_type='All'
     else:
         url = 'http://neuromorpho.org/api/neuron/select'
 
-    first_page_response = requests.get(url, params)
+    first_page_response = s.get(url, params=params)
 
     if first_page_response.status_code == 404 or first_page_response.status_code == 500:
         exit(1)
@@ -101,7 +104,7 @@ def acquisition(progress_var, brain_region='All', species='All', cell_type='All'
     progress_step = 20.0/totalPages
     for pageNum in range(totalPages):
         params['page'] = pageNum
-        response = requests.get(url, params)
+        response = s.get(url, params=params)
         print('Querying page {} -> status code: {}'.format(
             pageNum, response.status_code))
         if (response.status_code == 200):  # only parse successful requests
@@ -169,7 +172,7 @@ def acquisition(progress_var, brain_region='All', species='All', cell_type='All'
     progress_value = 0.0
     for i in n:
         url = "http://neuromorpho.org/api/morphometry/id/" + str(i)
-        response = requests.get(url)
+        response = s.get(url)
         json_data = response.json()
         morphometry.append(json_data)
         progress_value += progress_step
@@ -292,5 +295,9 @@ def acquisition(progress_var, brain_region='All', species='All', cell_type='All'
 
     progress_var.set(100)
     print(final_df)
+
+    finishtime = datetime.datetime.now() - starttime
+
+    print(finishtime)
     print("DONE!")
 

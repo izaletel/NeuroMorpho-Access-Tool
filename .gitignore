@@ -1,0 +1,16 @@
+venv
+.idea
+
+
+*.pkl
+*.csv
+
+
+__pycache__
+
+
+dist
+build
+main.spec
+
+output

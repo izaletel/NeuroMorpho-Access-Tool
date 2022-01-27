@@ -300,4 +300,5 @@ def acquisition(progress_var, brain_region='All', species='All', cell_type='All'
 
     print(finishtime)
     print("DONE!")
+    progress_var.set(0)
 

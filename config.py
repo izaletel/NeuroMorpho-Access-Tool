@@ -41,3 +41,6 @@ species_all = [
 
 
 cell_types = ['All', 'Glia', 'interneuron', 'principal cell', 'sensory']
+
+
+text_width = 100

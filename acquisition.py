@@ -7,6 +7,8 @@ import datetime
 
 from tkinter import *
 
+from config import text_width
+
 
 def acquisition_thread(progress_var, brain_region='All', species='All', cell_type='All'):
     th = threading.Thread(target=acquisition, args=(progress_var, brain_region, species, cell_type))
@@ -107,7 +109,7 @@ def acquisition(progress_var, brain_region='All', species='All', cell_type='All'
         response = s.get(url, params=params)
         print('Querying page {} -> status code: {}'.format(
             pageNum, response.status_code))
-        if (response.status_code == 200):  # only parse successful requests
+        if response.status_code == 200:  # only parse successful requests
             data = response.json()
             for row in data['_embedded']['neuronResources']:
                 df_dict['NeuronID'].append(str(row['neuron_id']))
@@ -177,7 +179,7 @@ def acquisition(progress_var, brain_region='All', species='All', cell_type='All'
         morphometry.append(json_data)
         progress_value += progress_step
         progress_var.set(30 + progress_value)
-        print('Querying page {} -> status code: {}'.format(str(i), response.status_code))
+        print('Querying cells {} -> status code: {}'.format(str(i), response.status_code))
     progress_var.set(70)
     print("Creating morphometry Data Frame")
     df_dict = {}
@@ -300,5 +302,6 @@ def acquisition(progress_var, brain_region='All', species='All', cell_type='All'
 
     print(finishtime)
     print("DONE!")
+    print("\n" + "#" * text_width + "\n")
     progress_var.set(0)
 

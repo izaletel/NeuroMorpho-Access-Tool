@@ -3,6 +3,7 @@
 from tkinter import *
 from tkinter import ttk
 from acquisition import *
+from image import *
 from config import *
 from tkinter.scrolledtext import ScrolledText
 
@@ -31,17 +32,25 @@ if __name__ == "__main__":
     window.resizable(width=False, height=False)
     # window.geometry('800x600')
 
-    frame = Frame(window, width=400, height=660, borderwidth=1, relief=RIDGE)
+    tab_parent = ttk.Notebook(window)
+    tab_acquire = ttk.Frame(tab_parent)
+    tab_image = ttk.Frame(tab_parent)
+    tab_parent.add(tab_acquire, text="Generate CSV")
+    tab_parent.add(tab_image, text="Get Images")
+
+    tab_parent.pack(expand=1, fill='both')
+
+    frame = Frame(tab_acquire, width=400, height=660, borderwidth=1, relief=RIDGE)
     frame.grid(row=0, column=0, sticky=W, pady=2)
 
-    buttonframe = Frame(window, width=400, height=200, borderwidth=1, relief=RIDGE)
+    buttonframe = Frame(tab_acquire, width=400, height=200, borderwidth=1, relief=RIDGE)
     buttonframe.grid(row=1, column=0, sticky=N, pady=2)
 
-    textframe = Frame(window, width=400, height=660, borderwidth=1, relief=RIDGE)
+    textframe = Frame(tab_acquire, width=400, height=660, borderwidth=1, relief=RIDGE)
     textframe.grid(row=2, column=0, sticky=W, pady=2)
 
     bottomframe = Frame(window, width=400, height=200, borderwidth=1, relief=RIDGE)
-    bottomframe.grid(row=3, column=0, sticky=N, pady=2)
+    bottomframe.pack(side=BOTTOM)
 
     brain_region_menu = ttk.Combobox(master=frame, width=20, values=brain_regions)
     brain_region_menu.set(brain_regions[0])
@@ -80,6 +89,17 @@ if __name__ == "__main__":
 
     text = ScrolledText(textframe, height=25, width=text_width)
     text.pack(side="left", fill="both", expand=True)
+
+    image_csv_choice = ttk.Combobox(tab_image, values=get_filenames(path='./output', suffix='.csv'), state='readonly')
+    image_csv_choice.pack(fill='x')
+
+    image_button = Button(
+        master=tab_image,
+        text="Execute",
+        command=lambda: get_images_thread(
+            path='./output/', csv_file=image_csv_choice.get())
+    )
+    image_button.pack(fill="none", expand=True)
 
     exit_button = Button(bottomframe, text="Quit", command=window.destroy)
     exit_button.pack(fill="none", expand=True)

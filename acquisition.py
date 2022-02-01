@@ -55,6 +55,7 @@ def acquisition(progress_var, brain_region='All', species='All', cell_type='All'
     first_page_response = s.get(url, params=params)
 
     if first_page_response.status_code == 404 or first_page_response.status_code == 500:
+        print("Not found!")
         exit(1)
 
     totalPages = first_page_response.json()['page']['totalPages']
@@ -228,7 +229,7 @@ def acquisition(progress_var, brain_region='All', species='All', cell_type='All'
         df_dict['Fractal dimension'].append(str(row['fractal_Dim']))
         df_dict['Bifurcation angle remote'].append(str(row['bif_ampl_remote']))
         df_dict['Length'].append(str(row['length']))
-        morphometry_df = pd.DataFrame(df_dict)
+    morphometry_df = pd.DataFrame(df_dict)
 
     progress_var.set(75)
 
@@ -289,7 +290,10 @@ def acquisition(progress_var, brain_region='All', species='All', cell_type='All'
     # excess NeuronID column left when joinging two dataframes
     final_df = final_df.drop(columns=['NeuronID'])
 
-    file_name = "./output/NM_" + str(brain_region) + "_" + str(species) + "_" + str(cell_type) + ".csv"
+    file_name = "./output/NM_" + \
+                str(brain_region).replace(" ", "_") + "_" + \
+                str(species).replace(" ", "_") + "_" + \
+                str(cell_type).replace(" ", "_") + ".csv"
 
     final_df.to_pickle(file_name)
 

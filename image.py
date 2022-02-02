@@ -31,7 +31,10 @@ def get_images(path='./', csv_file=''):
             url = row['Png URL']
             if url and url != "None":
                 print(url)
-                download_file(url, path=images_subdir)
+                try:
+                    download_file(url, path=images_subdir)
+                except Exception as e:
+                    print(e)
 
 
 def get_filenames(path='./', suffix=".csv"):

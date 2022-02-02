@@ -21,6 +21,9 @@ def download_file(url, path='./'):
 
 
 def get_images(path='./', csv_file=''):
+    if csv_file == 'None':
+        print("No files available")
+        return 0
     images_path = path + 'images/'
     images_subdir = images_path + csv_file.split('.')[0] + '/'
 

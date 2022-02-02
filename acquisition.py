@@ -56,7 +56,7 @@ def acquisition(progress_var, brain_region='All', species='All', cell_type='All'
 
     if first_page_response.status_code == 404 or first_page_response.status_code == 500:
         print("Not found!")
-        exit(1)
+        return 0
 
     totalPages = first_page_response.json()['page']['totalPages']
 

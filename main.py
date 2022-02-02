@@ -88,7 +88,7 @@ if __name__ == "__main__":
 
     execute_button = Button(
         master=acqbuttonframe,
-        text="Execute",
+        text="Get CSV",
         command=lambda: acquisition_thread(
             progress_var, brain_region_menu.get(), species_choice_menu.get(), cell_type_choice_menu.get())
     )
@@ -97,11 +97,16 @@ if __name__ == "__main__":
     text = ScrolledText(textframe, height=25, width=text_width)
     text.pack(side="left", fill="both", expand=True)
 
+    os.makedirs('./output', exist_ok=True)
+
+    image_csv_choice_list = get_filenames(path='./output', suffix='.csv')
+    if not image_csv_choice_list:
+        image_csv_choice_list = ["None"]
     image_csv_choice = ttk.Combobox(imgframe,
-                                    values=get_filenames(path='./output', suffix='.csv'), state='readonly')
+                                    values=image_csv_choice_list, state='readonly')
     image_csv_choice_label = Label(imgframe, text="CSV file:")
     image_csv_choice_label.pack(fill="x", expand=False, side='top')
-    image_csv_choice.set(get_filenames(path='./output', suffix='.csv')[0])
+    image_csv_choice.set(image_csv_choice_list[0])
     image_csv_choice.pack(fill="x", expand=True)
 
     image_button = Button(

@@ -48,16 +48,16 @@ if __name__ == "__main__":
     acqbuttonframe.grid(row=1, column=0, sticky=N, pady=2)
 
     imgframe = Frame(tab_image, width=400, height=200, borderwidth=1, relief=RIDGE)
-    imgframe.grid(row=0, column=0, sticky=N, pady=2)
+    imgframe.pack(fill="both", expand=True)
 
     imgbuttonframe = Frame(tab_image, width=400, height=200, borderwidth=1, relief=RIDGE)
-    imgbuttonframe.grid(row=1, column=0, sticky=N, pady=2)
+    imgbuttonframe.pack(fill="both", expand=True)
 
     textframe = Frame(window, width=400, height=660, borderwidth=1, relief=RIDGE)
-    textframe.grid(row=2, column=0, sticky=W, pady=2)
+    textframe.grid(row=1, column=0, sticky=W, pady=2)
 
     bottomframe = Frame(window, width=400, height=200, borderwidth=1, relief=RIDGE)
-    bottomframe.grid(row=3, column=0, sticky=N, pady=2)
+    bottomframe.grid(row=2, column=0, sticky=N, pady=2)
 
     brain_region_menu = ttk.Combobox(master=acqframe, width=20, values=brain_regions)
     brain_region_menu.set(brain_regions[0])
@@ -100,13 +100,13 @@ if __name__ == "__main__":
     image_csv_choice = ttk.Combobox(imgframe,
                                     values=get_filenames(path='./output', suffix='.csv'), state='readonly')
     image_csv_choice_label = Label(imgframe, text="CSV file:")
-    image_csv_choice_label.pack(fill="both", expand=True)
+    image_csv_choice_label.pack(fill="x", expand=False, side='top')
     image_csv_choice.set(get_filenames(path='./output', suffix='.csv')[0])
-    image_csv_choice.pack(fill="both")
+    image_csv_choice.pack(fill="x", expand=True)
 
     image_button = Button(
         master=imgbuttonframe,
-        text="Execute",
+        text="Get Images",
         command=lambda: get_images_thread(
             path='./output/', csv_file=image_csv_choice.get())
     )

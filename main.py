@@ -9,7 +9,7 @@ from tkinter.scrolledtext import ScrolledText
 
 import sys
 
-
+'''
 def decorator(func):
     def inner(inputStr):
         try:
@@ -25,6 +25,7 @@ def decorator(func):
 
 
 sys.stdout.write = decorator(sys.stdout.write)
+'''
 
 if __name__ == "__main__":
     window = Tk()
@@ -90,7 +91,8 @@ if __name__ == "__main__":
         master=acqbuttonframe,
         text="Get CSV",
         command=lambda: acquisition_thread(
-            progress_var, brain_region_menu.get(), species_choice_menu.get(), cell_type_choice_menu.get())
+            progressbar, text,
+            brain_region_menu.get(), species_choice_menu.get(), cell_type_choice_menu.get())
     )
     execute_button.pack(fill="none", expand=True)
 

@@ -92,7 +92,7 @@ if __name__ == "__main__":
         master=acqbuttonframe,
         text="Get CSV",
         command=lambda: acquisition_thread(
-            progressbar, text,
+            progressbar, progress_var, text,
             brain_region_menu.get(), species_choice_menu.get(), cell_type_choice_menu.get())
     )
     execute_button.pack(fill="none", expand=True)

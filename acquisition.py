@@ -10,16 +10,17 @@ from tkinter import *
 from config import text_width
 
 
-def acquisition_thread(progressbar='', textbox='', brain_region='All', species='All', cell_type='All'):
-    acq = Acquisition(progressbar=progressbar, textbox=textbox,
+def acquisition_thread(progressbar='', progress_var='', textbox='', brain_region='All', species='All', cell_type='All'):
+    acq = Acquisition(progressbar=progressbar, progress_var=progress_var, textbox=textbox,
                       brain_region=brain_region, species=species, cell_type=cell_type)
     acq.start()
 
 
 class Acquisition(threading.Thread):
-    def __init__(self, progressbar='', textbox='', brain_region='All', species='All', cell_type='All'):
+    def __init__(self, progressbar='', progress_var='', textbox='',
+                 brain_region='All', species='All', cell_type='All'):
 
-        self.progressbar, self.textbox = progressbar, textbox
+        self.progressbar, self.progress_var, self.textbox = progressbar, progress_var, textbox
         self.brain_region, self.species, self.cell_type = brain_region, species, cell_type
 
         threading.Thread.__init__(self)
@@ -47,7 +48,7 @@ class Acquisition(threading.Thread):
         if cell_type != 'All':
             params_widg['cell_type'] = 'cell_type:' + cell_type
 
-        self.progressbar.step(0)
+        self.progress_var.set(0)
         self.print_to_textbox(brain_region + '\n' + species + '\n' + cell_type + '\n')
 
         params = {}
@@ -173,16 +174,16 @@ class Acquisition(threading.Thread):
                     df_dict['Reference PMID'].append(str(row['reference_pmid']))
                     df_dict['Reference DOI'].append(str(row['reference_doi']))
                     df_dict['Physical Integrity'].append(str(row['physical_Integrity']))
-            self.progressbar.step(pageNum * progress_step)
-        self.progressbar.step(20)
+            self.progress_var.set(pageNum * progress_step)
+        self.progress_var.set(20)
 
         self.print_to_textbox("Creating neuron Data Frame")
         neurons_df = pd.DataFrame(df_dict)
-        self.progressbar.step(25)
+        self.progress_var.set(25)
         self.print_to_textbox("Pickling neurons")
         os.makedirs("./output", exist_ok=True)
         neurons_df.to_pickle("./output/neurons.pkl")
-        self.progressbar.step(30)
+        self.progress_var.set(30)
 
         # the ID number of previously obtained neurons is used to obtain their morphometric details
 
@@ -198,9 +199,9 @@ class Acquisition(threading.Thread):
             json_data = response.json()
             morphometry.append(json_data)
             progress_value += progress_step
-            self.progressbar.step(30 + progress_value)
+            self.progress_var.set(30 + progress_value)
             self.print_to_textbox('Querying cells {} -> status code: {}'.format(str(i), response.status_code))
-        self.progressbar.step(70)
+        self.progress_var.set(70)
         self.print_to_textbox("Creating morphometry Data Frame")
         df_dict = {}
         df_dict['Neuron ID'] = []
@@ -250,7 +251,7 @@ class Acquisition(threading.Thread):
             df_dict['Length'].append(str(row['length']))
         morphometry_df = pd.DataFrame(df_dict)
 
-        self.progressbar.step(75)
+        self.progress_var.set(75)
 
         self.print_to_textbox("Pickling morphometry")
         morphometry_df.to_pickle("./output/morphometry.pkl")
@@ -262,7 +263,7 @@ class Acquisition(threading.Thread):
         neurons = open("./output/morphometry.pkl", "rb")
         neurons_df = pickle.load(neurons)
         neurons.close()
-        self.progressbar.step(80)
+        self.progress_var.set(80)
         self.print_to_textbox(neurons_df)
 
         neurons_df = neurons_df.replace({'Soma surface': {'None': ''}}, regex=True)
@@ -295,13 +296,13 @@ class Acquisition(threading.Thread):
         neurons = open("./output/neurons.pkl", "rb")
         neurons_id_df = pickle.load(neurons)
         neurons.close()
-        self.progressbar.step(85)
+        self.progress_var.set(85)
         self.print_to_textbox(neurons_id_df)
 
         neuron_morphometry = open("./output/neurons_float.pkl", "rb")
         neuron_morphometry_df = pickle.load(neuron_morphometry)
         neuron_morphometry.close()
-        self.progressbar.step(90)
+        self.progress_var.set(90)
         self.print_to_textbox(neuron_morphometry_df)
 
         final_df = neurons_id_df.join(neuron_morphometry_df)
@@ -318,13 +319,13 @@ class Acquisition(threading.Thread):
 
         final_df.to_csv(file_name, index=False)
 
-        self.progressbar.step(100)
+        self.progress_var.set(100)
         self.print_to_textbox(final_df)
 
         finishtime = datetime.datetime.now() - starttime
 
-        self.print_to_textbox(finishtime)
+        self.print_to_textbox(str(finishtime))
         self.print_to_textbox("DONE!")
         self.print_to_textbox("\n" + "#" * text_width + "\n")
-        self.progressbar.step(-100)
+        self.progress_var.set(0)
 

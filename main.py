@@ -27,6 +27,7 @@ def decorator(func):
 sys.stdout.write = decorator(sys.stdout.write)
 '''
 
+
 if __name__ == "__main__":
     window = Tk()
     window.title('NeuroMorpho Access Tool')

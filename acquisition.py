@@ -26,6 +26,7 @@ class Acquisition(threading.Thread):
 
     def print_to_textbox(self, text):
         try:
+            text = text + '\n'
             print(text)
             self.textbox.insert(INSERT, text)
             self.textbox.see(END)
@@ -46,7 +47,7 @@ class Acquisition(threading.Thread):
         if cell_type != 'All':
             params_widg['cell_type'] = 'cell_type:' + cell_type
 
-        self.progressbar['value'] = 0.0
+        self.progressbar.step(0)
         self.print_to_textbox(brain_region + '\n' + species + '\n' + cell_type + '\n')
 
         params = {}
@@ -73,7 +74,7 @@ class Acquisition(threading.Thread):
         first_page_response = s.get(url, params=params)
 
         if first_page_response.status_code == 404 or first_page_response.status_code == 500:
-            print("Not found!")
+            self.print_to_textbox("Not found!")
             return 0
 
         totalPages = first_page_response.json()['page']['totalPages']
@@ -121,12 +122,12 @@ class Acquisition(threading.Thread):
             'Reference DOI': list(),
             'Physical Integrity': list()}
 
-        print("Getting Neurons - total pages:" + str(totalPages))
+        self.print_to_textbox("Getting Neurons - total pages:" + str(totalPages))
         progress_step = 20.0/totalPages
         for pageNum in range(totalPages):
             params['page'] = pageNum
             response = s.get(url, params=params)
-            print('Querying page {} -> status code: {}'.format(
+            self.print_to_textbox('Querying page {} -> status code: {}'.format(
                 pageNum, response.status_code))
             if response.status_code == 200:  # only parse successful requests
                 data = response.json()
@@ -172,22 +173,22 @@ class Acquisition(threading.Thread):
                     df_dict['Reference PMID'].append(str(row['reference_pmid']))
                     df_dict['Reference DOI'].append(str(row['reference_doi']))
                     df_dict['Physical Integrity'].append(str(row['physical_Integrity']))
-            self.progressbar['value'] = pageNum * progress_step
-        self.progressbar['value'] = 20
+            self.progressbar.step(pageNum * progress_step)
+        self.progressbar.step(20)
 
-        print("Creating neuron Data Frame")
+        self.print_to_textbox("Creating neuron Data Frame")
         neurons_df = pd.DataFrame(df_dict)
-        self.progressbar['value'] = 25
-        print("Pickling neurons")
+        self.progressbar.step(25)
+        self.print_to_textbox("Pickling neurons")
         os.makedirs("./output", exist_ok=True)
         neurons_df.to_pickle("./output/neurons.pkl")
-        self.progressbar['value'] = 30
+        self.progressbar.step(30)
 
         # the ID number of previously obtained neurons is used to obtain their morphometric details
 
         n = neurons_df['NeuronID'].to_numpy()
 
-        print("Getting morphometry")
+        self.print_to_textbox("Getting morphometry")
         morphometry = []
         progress_step = 40.0 / n.size
         progress_value = 0.0
@@ -197,10 +198,10 @@ class Acquisition(threading.Thread):
             json_data = response.json()
             morphometry.append(json_data)
             progress_value += progress_step
-            self.progressbar['value'] = 30 + progress_value
-            print('Querying cells {} -> status code: {}'.format(str(i), response.status_code))
-        self.progressbar['value'] = 70
-        print("Creating morphometry Data Frame")
+            self.progressbar.step(30 + progress_value)
+            self.print_to_textbox('Querying cells {} -> status code: {}'.format(str(i), response.status_code))
+        self.progressbar.step(70)
+        self.print_to_textbox("Creating morphometry Data Frame")
         df_dict = {}
         df_dict['Neuron ID'] = []
         df_dict['Surface'] = []
@@ -249,9 +250,9 @@ class Acquisition(threading.Thread):
             df_dict['Length'].append(str(row['length']))
         morphometry_df = pd.DataFrame(df_dict)
 
-        self.progressbar['value'] = 75
+        self.progressbar.step(75)
 
-        print("Pickling morphometry")
+        self.print_to_textbox("Pickling morphometry")
         morphometry_df.to_pickle("./output/morphometry.pkl")
 
         # the following is a list of steps used to currate the morphometric data
@@ -261,8 +262,8 @@ class Acquisition(threading.Thread):
         neurons = open("./output/morphometry.pkl", "rb")
         neurons_df = pickle.load(neurons)
         neurons.close()
-        self.progressbar['value'] = 80
-        print(neurons_df)
+        self.progressbar.step(80)
+        self.print_to_textbox(neurons_df)
 
         neurons_df = neurons_df.replace({'Soma surface': {'None': ''}}, regex=True)
 
@@ -294,14 +295,14 @@ class Acquisition(threading.Thread):
         neurons = open("./output/neurons.pkl", "rb")
         neurons_id_df = pickle.load(neurons)
         neurons.close()
-        self.progressbar['value'] = 85
-        print(neurons_id_df)
+        self.progressbar.step(85)
+        self.print_to_textbox(neurons_id_df)
 
         neuron_morphometry = open("./output/neurons_float.pkl", "rb")
         neuron_morphometry_df = pickle.load(neuron_morphometry)
         neuron_morphometry.close()
-        self.progressbar['value'] = 90
-        print(neuron_morphometry_df)
+        self.progressbar.step(90)
+        self.print_to_textbox(neuron_morphometry_df)
 
         final_df = neurons_id_df.join(neuron_morphometry_df)
 
@@ -317,13 +318,13 @@ class Acquisition(threading.Thread):
 
         final_df.to_csv(file_name, index=False)
 
-        self.progressbar['value'] = 100
-        print(final_df)
+        self.progressbar.step(100)
+        self.print_to_textbox(final_df)
 
         finishtime = datetime.datetime.now() - starttime
 
-        print(finishtime)
-        print("DONE!")
-        print("\n" + "#" * text_width + "\n")
-        self.progressbar['value'] = 0
+        self.print_to_textbox(finishtime)
+        self.print_to_textbox("DONE!")
+        self.print_to_textbox("\n" + "#" * text_width + "\n")
+        self.progressbar.step(-100)
 

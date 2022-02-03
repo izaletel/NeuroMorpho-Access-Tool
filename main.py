@@ -28,6 +28,11 @@ sys.stdout.write = decorator(sys.stdout.write)
 '''
 
 
+def update_combobox_list(combobox):
+    list = get_filenames(path='./output', suffix='.csv')
+    combobox['values'] = list
+
+
 if __name__ == "__main__":
     window = Tk()
     window.title('NeuroMorpho Access Tool')
@@ -49,14 +54,17 @@ if __name__ == "__main__":
     acqbuttonframe = Frame(tab_acquire, width=400, height=200, borderwidth=1, relief=RIDGE)
     acqbuttonframe.grid(row=1, column=0, sticky=N, pady=2)
 
+    acqtextframe = Frame(tab_acquire, width=400, height=660, borderwidth=1, relief=RIDGE)
+    acqtextframe.grid(row=2, column=0, sticky=W, pady=2)
+
     imgframe = Frame(tab_image, width=400, height=200, borderwidth=1, relief=RIDGE)
     imgframe.pack(fill="both", expand=True)
 
     imgbuttonframe = Frame(tab_image, width=400, height=200, borderwidth=1, relief=RIDGE)
     imgbuttonframe.pack(fill="both", expand=True)
 
-    textframe = Frame(window, width=400, height=660, borderwidth=1, relief=RIDGE)
-    textframe.grid(row=1, column=0, sticky=W, pady=2)
+    imgtextframe = Frame(tab_image, width=400, height=660, borderwidth=1, relief=RIDGE)
+    imgtextframe.pack(fill="both", expand=True)
 
     bottomframe = Frame(window, width=400, height=200, borderwidth=1, relief=RIDGE)
     bottomframe.grid(row=2, column=0, sticky=N, pady=2)
@@ -88,25 +96,28 @@ if __name__ == "__main__":
     progressbar.grid(row=1, column=2, sticky=W, pady=2, padx=100)
     progressbar_label.grid(row=0, column=2, sticky=W, pady=2, padx=100)
 
-    execute_button = Button(
+    acq_button = Button(
         master=acqbuttonframe,
         text="Get CSV",
         command=lambda: acquisition_thread(
-            progressbar, progress_var, text,
+            progressbar, progress_var, acqtextbox,
             brain_region_menu.get(), species_choice_menu.get(), cell_type_choice_menu.get())
     )
-    execute_button.pack(fill="none", expand=True)
+    acq_button.pack(fill="none", expand=True)
 
-    text = ScrolledText(textframe, height=25, width=text_width)
-    text.pack(side="left", fill="both", expand=True)
+    acqtextbox = ScrolledText(acqtextframe, height=25, width=text_width)
+    acqtextbox.pack(side="left", fill="both", expand=True)
+
+    imgtextbox = ScrolledText(imgtextframe, height=25, width=text_width)
+    imgtextbox.pack(side="left", fill="both", expand=True)
 
     os.makedirs('./output', exist_ok=True)
 
     image_csv_choice_list = get_filenames(path='./output', suffix='.csv')
     if not image_csv_choice_list:
         image_csv_choice_list = ["None"]
-    image_csv_choice = ttk.Combobox(imgframe,
-                                    values=image_csv_choice_list, state='readonly')
+    image_csv_choice = ttk.Combobox(imgframe, values=image_csv_choice_list, state='readonly',
+                                    postcommand=lambda: update_combobox_list(image_csv_choice))
     image_csv_choice_label = Label(imgframe, text="CSV file:")
     image_csv_choice_label.pack(fill="x", expand=False, side='top')
     image_csv_choice.set(image_csv_choice_list[0])

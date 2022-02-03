@@ -27,12 +27,6 @@ def decorator(func):
 sys.stdout.write = decorator(sys.stdout.write)
 '''
 
-
-def update_combobox_list(combobox):
-    list = get_filenames(path='./output', suffix='.csv')
-    combobox['values'] = list
-
-
 if __name__ == "__main__":
     window = Tk()
     window.title('NeuroMorpho Access Tool')
@@ -123,10 +117,20 @@ if __name__ == "__main__":
     image_csv_choice.set(image_csv_choice_list[0])
     image_csv_choice.pack(fill="x", expand=True)
 
+    imgprogress_var = DoubleVar()
+    imgprogress_var.set(0)
+
+    imgprogressbar = ttk.Progressbar(
+        master=imgframe, orient=HORIZONTAL, length=400, mode='determinate', variable=imgprogress_var)
+    imgprogressbar_label = Label(imgframe, text="Progress")
+    imgprogressbar_label.pack(fill="x", expand=True)
+    imgprogressbar.pack(fill="both", expand=True)
+
     image_button = Button(
         master=imgbuttonframe,
         text="Get Images",
         command=lambda: get_images_thread(
+            imgprogressbar, imgprogress_var, imgtextbox,
             path='./output/', csv_file=image_csv_choice.get())
     )
     image_button.pack(fill="none", expand=True)

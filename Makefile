@@ -1,4 +1,5 @@
 build:
-	pyinstaller -D -F -w -n neuromorpho "main.py"
+	pyinstaller neuromorpho.spec
 clean:
-	rm -r build dist
+	rm -r build
+	rm -r dist

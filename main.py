@@ -3,12 +3,13 @@
 from tkinter import *
 from tkinter import ttk
 from acquisition import *
+from image import *
 from config import *
 from tkinter.scrolledtext import ScrolledText
 
 import sys
 
-
+'''
 def decorator(func):
     def inner(inputStr):
         try:
@@ -24,6 +25,7 @@ def decorator(func):
 
 
 sys.stdout.write = decorator(sys.stdout.write)
+'''
 
 if __name__ == "__main__":
     window = Tk()
@@ -31,33 +33,51 @@ if __name__ == "__main__":
     window.resizable(width=False, height=False)
     # window.geometry('800x600')
 
-    frame = Frame(window, width=400, height=660, borderwidth=1, relief=RIDGE)
-    frame.grid(row=0, column=0, sticky=W, pady=2)
+    tab_parent = ttk.Notebook(window)
+    tab_acquire = ttk.Frame(tab_parent)
+    tab_image = ttk.Frame(tab_parent)
+    tab_parent.add(tab_acquire, text="Generate CSV")
+    tab_parent.add(tab_image, text="Get Images")
 
-    buttonframe = Frame(window, width=400, height=200, borderwidth=1, relief=RIDGE)
-    buttonframe.grid(row=1, column=0, sticky=N, pady=2)
+    #tab_parent.pack(expand=1, fill='both')
+    tab_parent.grid(row=0, column=0, sticky=W, pady=2)
 
-    textframe = Frame(window, width=400, height=660, borderwidth=1, relief=RIDGE)
-    textframe.grid(row=2, column=0, sticky=W, pady=2)
+    acqframe = Frame(tab_acquire, width=400, height=200, borderwidth=1, relief=RIDGE)
+    acqframe.grid(row=0, column=0, sticky=W, pady=2)
+
+    acqbuttonframe = Frame(tab_acquire, width=400, height=200, borderwidth=1, relief=RIDGE)
+    acqbuttonframe.grid(row=1, column=0, sticky=N, pady=2)
+
+    acqtextframe = Frame(tab_acquire, width=400, height=660, borderwidth=1, relief=RIDGE)
+    acqtextframe.grid(row=2, column=0, sticky=W, pady=2)
+
+    imgframe = Frame(tab_image, width=400, height=200, borderwidth=1, relief=RIDGE)
+    imgframe.pack(fill="both", expand=True)
+
+    imgbuttonframe = Frame(tab_image, width=400, height=200, borderwidth=1, relief=RIDGE)
+    imgbuttonframe.pack(fill="both", expand=True)
+
+    imgtextframe = Frame(tab_image, width=400, height=660, borderwidth=1, relief=RIDGE)
+    imgtextframe.pack(fill="both", expand=True)
 
     bottomframe = Frame(window, width=400, height=200, borderwidth=1, relief=RIDGE)
-    bottomframe.grid(row=3, column=0, sticky=N, pady=2)
+    bottomframe.grid(row=2, column=0, sticky=N, pady=2)
 
-    brain_region_menu = ttk.Combobox(master=frame, width=20, values=brain_regions)
+    brain_region_menu = ttk.Combobox(master=acqframe, width=20, values=brain_regions)
     brain_region_menu.set(brain_regions[0])
-    brain_region_menu_label = Label(frame, text="Brain Region:")
+    brain_region_menu_label = Label(acqframe, text="Brain Region:")
     brain_region_menu.grid(row=0, column=1, sticky=W, pady=2)
     brain_region_menu_label.grid(row=0, column=0, sticky=W, pady=2)
 
-    species_choice_menu = ttk.Combobox(master=frame, width=20, values=species_all)
+    species_choice_menu = ttk.Combobox(master=acqframe, width=20, values=species_all)
     species_choice_menu.set(species_all[0])
-    species_choice_menu_label = Label(frame, text="Species:")
+    species_choice_menu_label = Label(acqframe, text="Species:")
     species_choice_menu.grid(row=1, column=1, sticky=W, pady=2)
     species_choice_menu_label.grid(row=1, column=0, sticky=W, pady=2)
 
-    cell_type_choice_menu = ttk.Combobox(master=frame, width=20, values=cell_types)
+    cell_type_choice_menu = ttk.Combobox(master=acqframe, width=20, values=cell_types)
     cell_type_choice_menu.set(cell_types[0])
-    cell_type_choice_menu_label = Label(frame, text="Cell Type:")
+    cell_type_choice_menu_label = Label(acqframe, text="Cell Type:")
     cell_type_choice_menu.grid(row=2, column=1, sticky=W, pady=2)
     cell_type_choice_menu_label.grid(row=2, column=0, sticky=W, pady=2)
 
@@ -65,21 +85,55 @@ if __name__ == "__main__":
     progress_var.set(0)
 
     progressbar = ttk.Progressbar(
-        master=frame, orient=HORIZONTAL, length=400, mode='determinate', variable=progress_var)
-    progressbar_label = Label(frame, text="Progress")
+        master=acqframe, orient=HORIZONTAL, length=400, mode='determinate', variable=progress_var)
+    progressbar_label = Label(acqframe, text="Progress")
     progressbar.grid(row=1, column=2, sticky=W, pady=2, padx=100)
     progressbar_label.grid(row=0, column=2, sticky=W, pady=2, padx=100)
 
-    execute_button = Button(
-        master=buttonframe,
-        text="Execute",
+    acq_button = Button(
+        master=acqbuttonframe,
+        text="Get CSV",
         command=lambda: acquisition_thread(
-            progress_var, brain_region_menu.get(), species_choice_menu.get(), cell_type_choice_menu.get())
+            progressbar, progress_var, acqtextbox,
+            brain_region_menu.get(), species_choice_menu.get(), cell_type_choice_menu.get())
     )
-    execute_button.pack(fill="none", expand=True)
+    acq_button.pack(fill="none", expand=True)
 
-    text = ScrolledText(textframe, height=25, width=text_width)
-    text.pack(side="left", fill="both", expand=True)
+    acqtextbox = ScrolledText(acqtextframe, height=25, width=text_width)
+    acqtextbox.pack(side="left", fill="both", expand=True)
+
+    imgtextbox = ScrolledText(imgtextframe, height=25, width=text_width)
+    imgtextbox.pack(side="left", fill="both", expand=True)
+
+    os.makedirs('./output', exist_ok=True)
+
+    image_csv_choice_list = get_filenames(path='./output', suffix='.csv')
+    if not image_csv_choice_list:
+        image_csv_choice_list = ["None"]
+    image_csv_choice = ttk.Combobox(imgframe, values=image_csv_choice_list, state='readonly',
+                                    postcommand=lambda: update_combobox_list(image_csv_choice))
+    image_csv_choice_label = Label(imgframe, text="CSV file:")
+    image_csv_choice_label.pack(fill="x", expand=False, side='top')
+    image_csv_choice.set(image_csv_choice_list[0])
+    image_csv_choice.pack(fill="x", expand=True)
+
+    imgprogress_var = DoubleVar()
+    imgprogress_var.set(0)
+
+    imgprogressbar = ttk.Progressbar(
+        master=imgframe, orient=HORIZONTAL, length=400, mode='determinate', variable=imgprogress_var)
+    imgprogressbar_label = Label(imgframe, text="Progress")
+    imgprogressbar_label.pack(fill="x", expand=True)
+    imgprogressbar.pack(fill="both", expand=True)
+
+    image_button = Button(
+        master=imgbuttonframe,
+        text="Get Images",
+        command=lambda: get_images_thread(
+            imgprogressbar, imgprogress_var, imgtextbox,
+            path='./output/', csv_file=image_csv_choice.get())
+    )
+    image_button.pack(fill="none", expand=True)
 
     exit_button = Button(bottomframe, text="Quit", command=window.destroy)
     exit_button.pack(fill="none", expand=True)

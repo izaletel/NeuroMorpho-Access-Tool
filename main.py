@@ -36,8 +36,11 @@ if __name__ == "__main__":
     tab_parent = ttk.Notebook(window)
     tab_acquire = ttk.Frame(tab_parent)
     tab_image = ttk.Frame(tab_parent)
+    tab_about = ttk.Frame(tab_parent)
     tab_parent.add(tab_acquire, text="Generate CSV")
     tab_parent.add(tab_image, text="Get Images")
+    tab_parent.add(tab_about, text="About")
+
 
     #tab_parent.pack(expand=1, fill='both')
     tab_parent.grid(row=0, column=0, sticky=W, pady=2)
@@ -104,6 +107,9 @@ if __name__ == "__main__":
 
     imgtextbox = ScrolledText(imgtextframe, height=25, width=text_width)
     imgtextbox.pack(side="left", fill="both", expand=True)
+
+    aboutlabel = Label(tab_about, text=about_text, justify=LEFT)
+    aboutlabel.pack(side="left", fill="both", expand=True)
 
     os.makedirs('./output', exist_ok=True)
 

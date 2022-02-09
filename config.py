@@ -44,3 +44,9 @@ cell_types = ['All', 'Glia', 'interneuron', 'principal cell', 'sensory']
 
 
 text_width = 100
+
+about_text = "Version 1.0\n" \
+             "github link: https://github.com/izaletel/NeuroMorpho-Access-Tools\n" \
+             "Maintainers: \n" \
+             "Ivan Zaletel: ivan.zaletel88@gmail.com\n" \
+             "Marko Vidakovic: mvidak@gmail.com\n"

@@ -27,6 +27,12 @@ def decorator(func):
 sys.stdout.write = decorator(sys.stdout.write)
 '''
 
+def acq_entry_var_set():
+    acq_entry_var.set('NM_{}_{}_{}.csv'.format(
+        brain_region_menu.get(), species_choice_menu.get(), cell_type_choice_menu.get()
+    ))
+    acq_entry.update_idletasks()
+
 if __name__ == "__main__":
     window = Tk()
     window.title('NeuroMorpho Access Tool')
@@ -78,7 +84,10 @@ if __name__ == "__main__":
     species_choice_menu.grid(row=1, column=1, sticky=W, pady=2)
     species_choice_menu_label.grid(row=1, column=0, sticky=W, pady=2)
 
-    cell_type_choice_menu = ttk.Combobox(master=acqframe, width=20, values=cell_types)
+    cell_type_choice_menu = ttk.Combobox(
+        master=acqframe, width=20, values=cell_types,
+        postcommand=lambda: acq_entry_var_set()
+    )
     cell_type_choice_menu.set(cell_types[0])
     cell_type_choice_menu_label = Label(acqframe, text="Cell Type:")
     cell_type_choice_menu.grid(row=2, column=1, sticky=W, pady=2)
@@ -95,12 +104,21 @@ if __name__ == "__main__":
 
     acq_button = Button(
         master=acqbuttonframe,
-        text="Get CSV",
+        text="Generate CSV",
         command=lambda: acquisition_thread(
             progressbar, progress_var, acqtextbox,
             brain_region_menu.get(), species_choice_menu.get(), cell_type_choice_menu.get())
     )
-    acq_button.pack(fill="none", expand=True)
+    acq_button.pack(fill="none", expand=True, side="left")
+
+    acq_entry_label = Label(acqbuttonframe, text="Name of file to generate:")
+    acq_entry_label.pack(fill="none", expand=True, side="left")
+
+    acq_entry_var = StringVar()
+    acq_entry_var.set('NM_All_All_All.csv')
+
+    acq_entry = Entry(acqbuttonframe, textvariable=acq_entry_var)
+    acq_entry.pack(fill="none", expand=True, side="left", ipadx=100)
 
     acqtextbox = ScrolledText(acqtextframe, height=25, width=text_width)
     acqtextbox.pack(side="left", fill="both", expand=True)
@@ -108,8 +126,10 @@ if __name__ == "__main__":
     imgtextbox = ScrolledText(imgtextframe, height=25, width=text_width)
     imgtextbox.pack(side="left", fill="both", expand=True)
 
-    aboutlabel = Label(tab_about, text=about_text, justify=LEFT)
-    aboutlabel.pack(side="left", fill="both", expand=True)
+    about_textbox = Text(tab_about, height=25, width=text_width, background="silver")
+    about_textbox.pack(side="left", fill="both", expand=True)
+    about_textbox.insert(1.0, about_text)
+    about_textbox.configure(state="disabled")
 
     os.makedirs('./output', exist_ok=True)
 

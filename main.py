@@ -7,25 +7,17 @@ from image import *
 from config import *
 from tkinter.scrolledtext import ScrolledText
 
+from PySide6.QtWidgets import QMainWindow, QApplication
+from qtgui import Ui_MainWindow
+
 import sys
 
-'''
-def decorator(func):
-    def inner(inputStr):
-        try:
-            text.insert(INSERT, inputStr)
-            text.see(END)
-            text.update_idletasks()
-            progressbar.update_idletasks()
-            return func(inputStr)
-        except:
-            return func(inputStr)
 
-    return inner
+class MainWindow(QMainWindow):
 
+    def __init__(self):
+        super().__init__()
 
-sys.stdout.write = decorator(sys.stdout.write)
-'''
 
 def acq_entry_var_set():
     acq_entry_var.set('NM_{}_{}_{}.csv'.format(
@@ -33,19 +25,24 @@ def acq_entry_var_set():
     ))
     acq_entry.update_idletasks()
 
+
 if __name__ == "__main__":
-    window = Tk()
-    window.title('NeuroMorpho Access Tool')
-    window.resizable(width=False, height=False)
-    # window.geometry('800x600')
+
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    ui_window = Ui_MainWindow()
+    ui_window.setupUi(window)
+
+    window.show()
+    app.exec()
 
     tab_parent = ttk.Notebook(window)
     tab_acquire = ttk.Frame(tab_parent)
     tab_image = ttk.Frame(tab_parent)
     tab_about = ttk.Frame(tab_parent)
     tab_parent.add(tab_acquire, text="Generate CSV")
-    tab_parent.add(tab_image, text="Get Images")
-    tab_parent.add(tab_about, text="About")
+    tab_parent.add(tab_image, text="")
+    tab_parent.add(tab_about, text="")
 
 
     #tab_parent.pack(expand=1, fill='both')

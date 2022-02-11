@@ -10,8 +10,9 @@ from config import text_width
 
 
 class Acquisition(guithread.GUIThread):
-    def __init__(self, brain_region='All', species='All', cell_type='All'):
+    def __init__(self, filename='default.csv', brain_region='All', species='All', cell_type='All'):
 
+        self.filename = filename
         self.brain_region, self.species, self.cell_type = brain_region, species, cell_type
         super().__init__()
 
@@ -294,10 +295,7 @@ class Acquisition(guithread.GUIThread):
         # excess NeuronID column left when joinging two dataframes
         final_df = final_df.drop(columns=['NeuronID'])
 
-        file_name = "./output/NM_" + \
-                    str(brain_region).replace(" ", "_") + "_" + \
-                    str(species).replace(" ", "_") + "_" + \
-                    str(cell_type).replace(" ", "_") + ".csv"
+        file_name = "./output/" + self.filename
 
         final_df.to_pickle(file_name)
 

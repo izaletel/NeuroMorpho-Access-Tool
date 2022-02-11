@@ -19,7 +19,6 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QLabel, QLineEdit,
     QMainWindow, QProgressBar, QPushButton, QSizePolicy,
     QTabWidget, QTextBrowser, QWidget)
 
-
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
@@ -94,6 +93,7 @@ class Ui_MainWindow(object):
         self.species_choice_menu_label.setText(QCoreApplication.translate("MainWindow", u"Species:", None))
         self.cell_type_choice_menu_label.setText(QCoreApplication.translate("MainWindow", u"Cell type:", None))
         self.acq_button.setText(QCoreApplication.translate("MainWindow", u"Generate CSV", None))
+        self.acq_entry.setText(QCoreApplication.translate("MainWindow", u"NM_All_All_All.csv", None))
 #if QT_CONFIG(accessibility)
         self.acq_entry_label.setAccessibleDescription("")
 #endif // QT_CONFIG(accessibility)

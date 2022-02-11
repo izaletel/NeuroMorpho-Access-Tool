@@ -5,14 +5,12 @@ from tkinter import ttk
 from acquisition import *
 from image import *
 from config import *
-from tkinter.scrolledtext import ScrolledText
 
 from PySide6.QtWidgets import QMainWindow, QApplication
 from PySide6.QtCore import QThreadPool, Slot
 from qtgui import Ui_MainWindow
 
 import sys
-import os
 
 
 class MainWindow(QMainWindow):
@@ -36,8 +34,8 @@ class MainWindow(QMainWindow):
         filebar.setText(filename)
 
     @Slot()
-    def acquisition_thread(self, brain_region='All', species='All', cell_type='All'):
-        self.acq = Acquisition(brain_region=brain_region, species=species, cell_type=cell_type)
+    def acquisition_thread(self, filename='default.csv', brain_region='All', species='All', cell_type='All'):
+        self.acq = Acquisition(filename=filename, brain_region=brain_region, species=species, cell_type=cell_type)
 
         self.acq.signals.text.connect(lambda text: self.print_to_textbox(ui_window.acq_textbox, text))
         self.acq.signals.progress.connect(lambda progress: self.set_progress(ui_window.acq_progressbar, progress))
@@ -79,13 +77,14 @@ if __name__ == "__main__":
         )
     )
 
-    # ui_window.exit_button.clicked.connect(app.quit())
     ui_window.acq_button.clicked.connect(
         lambda: window.acquisition_thread(
+            ui_window.acq_entry.text(),
             ui_window.brain_region_menu.currentText(),
             ui_window.species_choice_menu.currentText(),
             ui_window.cell_type_choice_menu.currentText())
     )
 
+    ui_window.exit_button.clicked.connect(app.quit)
     window.show()
     app.exec()

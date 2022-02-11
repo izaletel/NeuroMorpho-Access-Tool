@@ -150,6 +150,9 @@
         <height>21</height>
        </rect>
       </property>
+      <property name="text">
+       <string>NM_All_All_All.csv</string>
+      </property>
      </widget>
      <widget class="QLabel" name="acq_entry_label">
       <property name="geometry">

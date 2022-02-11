@@ -9,19 +9,11 @@ import guithread
 from config import text_width
 
 
-def acquisition_thread(progressbar='', progress_var='', textbox='', brain_region='All', species='All', cell_type='All'):
-    acq = Acquisition(progressbar=progressbar, progress_var=progress_var, textbox=textbox,
-                      brain_region=brain_region, species=species, cell_type=cell_type)
-    acq.start()
-
-
 class Acquisition(guithread.GUIThread):
-    def __init__(self, progressbar='', progress_var='', textbox='',
-                 brain_region='All', species='All', cell_type='All'):
+    def __init__(self, brain_region='All', species='All', cell_type='All'):
 
-        self.progressbar, self.progress_var, self.textbox = progressbar, progress_var, textbox
         self.brain_region, self.species, self.cell_type = brain_region, species, cell_type
-        super().__init__(progressbar, progress_var, textbox)
+        super().__init__()
 
     def run(self):
         brain_region, species, cell_type = self.brain_region, self.species, self.cell_type

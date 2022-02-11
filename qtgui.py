@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QLabel, QLineEdit,
     QMainWindow, QProgressBar, QPushButton, QSizePolicy,
     QTabWidget, QTextBrowser, QWidget)
 
+
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():

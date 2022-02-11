@@ -6,19 +6,11 @@ import guithread
 from config import text_width
 
 
-def get_images_thread(progressbar='', progress_var='', textbox='', path='./', csv_file=''):
-    img = Imaging(progressbar=progressbar, progress_var=progress_var, textbox=textbox,
-                      path=path, csv_file=csv_file)
-    img.start()
-
-
 class Imaging(guithread.GUIThread):
-    def __init__(self, progressbar='', progress_var='', textbox='',
-                 path='./', csv_file=''):
+    def __init__(self, path='./', csv_file=''):
 
-        self.progressbar, self.progress_var, self.textbox = progressbar, progress_var, textbox
         self.path, self.csv_file = path, csv_file
-        super().__init__(progressbar, progress_var, textbox)
+        super().__init__()
 
     def run(self):
         path = self.path

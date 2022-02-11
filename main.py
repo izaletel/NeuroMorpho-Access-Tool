@@ -41,6 +41,11 @@ class MainWindow(QMainWindow):
         self.acq.signals.progress.connect(lambda progress: self.set_progress(ui_window.acq_progressbar, progress))
         self.threadpool.start(self.acq)
 
+    @Slot()
+    def get_images_thread(self, path='./', csv_file=''):
+        self.img = Imaging(path=path, csv_file=csv_file)
+        self.threadpool.start(self.img)
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

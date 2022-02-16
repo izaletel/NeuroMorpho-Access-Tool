@@ -1,11 +1,10 @@
 import requests
 import pandas as pd
 import pickle
-import os
 import datetime
 import guithread
 
-
+from os import makedirs
 from config import text_width
 
 
@@ -166,7 +165,7 @@ class Acquisition(guithread.GUIThread):
         neurons_df = pd.DataFrame(df_dict)
         self.set_progress(25)
         self.print_to_textbox("Pickling neurons")
-        os.makedirs("./output", exist_ok=True)
+        makedirs("./output", exist_ok=True)
         neurons_df.to_pickle("./output/neurons.pkl")
         self.set_progress(30)
 

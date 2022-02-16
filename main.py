@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from tkinter import *
-from tkinter import ttk
 from acquisition import *
 from image import *
 from config import *
@@ -11,13 +9,13 @@ from PySide6.QtCore import QThreadPool, Slot
 from qtgui import Ui_MainWindow
 
 import sys
-import os
 
 
 class MainWindow(QMainWindow):
 
     def __init__(self):
         self.threadpool = QThreadPool()
+        self.threadpool.setMaxThreadCount(max_thread_count)
         super().__init__()
 
     def print_to_textbox(self, textbox, text):
@@ -50,10 +48,18 @@ class MainWindow(QMainWindow):
     @Slot()
     def get_images_thread(self, path='./', csv_files=''):
         for csv_file in csv_files.split(','):
-            self.img = Imaging(path=path, csv_file=csv_file)
-            self.img.signals.text.connect(lambda text: self.print_to_textbox(ui_window.img_textbox, text))
-            self.img.signals.progress.connect(lambda progress: self.set_progress(ui_window.img_progressbar, progress))
-            self.threadpool.start(self.img)
+            totalrows = sum(1 for _ in open(csv_file))
+            print(totalrows)
+            for i in range(0, max_thread_count):
+                self.img = Imaging(path=path, csv_file=csv_file, job_number=i)
+                self.img.signals.text.connect(
+                    lambda text: self.print_to_textbox(ui_window.img_textbox, text)
+                )
+                self.img.signals.progress.connect(
+                    lambda progress: self.set_progress(ui_window.img_progressbar, progress)
+                )
+                self.threadpool.start(self.img)
+
 
 
 if __name__ == "__main__":
@@ -61,7 +67,6 @@ if __name__ == "__main__":
     window = MainWindow()
     ui_window = Ui_MainWindow()
     ui_window.setupUi(window)
-    os.makedirs("./output", exist_ok=True)
 
     # Acquire tab
     ui_window.brain_region_menu.addItems(brain_regions)

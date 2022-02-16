@@ -27,7 +27,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_acquire">
      <attribute name="title">
@@ -175,11 +175,102 @@
      <attribute name="title">
       <string>Get Images</string>
      </attribute>
+     <widget class="QTextBrowser" name="img_textbox">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>150</y>
+        <width>751</width>
+        <height>371</height>
+       </rect>
+      </property>
+      <property name="openLinks">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QProgressBar" name="img_progressbar">
+      <property name="geometry">
+       <rect>
+        <x>450</x>
+        <y>10</y>
+        <width>281</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="img_button">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>110</y>
+        <width>111</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Download Images</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="img_csv_choice_list_label">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>10</y>
+        <width>81</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>CSV File:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="img_csv_choice_list">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>10</y>
+        <width>291</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="img_open_csv_file_button">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>50</y>
+        <width>101</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Open CSV files</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_about">
      <attribute name="title">
       <string>About</string>
      </attribute>
+     <widget class="QLabel" name="about_label">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>50</y>
+        <width>471</width>
+        <height>381</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QPushButton" name="exit_button">

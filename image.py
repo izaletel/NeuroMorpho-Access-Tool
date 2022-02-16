@@ -18,16 +18,17 @@ class Imaging(guithread.GUIThread):
         if csv_file == 'None':
             self.print_to_textbox("No files available")
             return 0
-        images_path = path + 'images/'
-        images_subdir = images_path + csv_file.split('.')[0] + '/'
+        csv_filename = os.path.basename(csv_file)
+        images_path = path + '/images/'
+        images_subdir = images_path + csv_filename.split('.')[0] + '/'
 
         os.makedirs(images_subdir, exist_ok=True)
         self.print_to_textbox("File is " + csv_file)
-        totalrows = sum(1 for _ in open('./output/' + csv_file))
+        totalrows = sum(1 for _ in open(csv_file))
         progress_step = 100.0 / totalrows
         progress_current = 0.0
         self.set_progress(progress_current)
-        with open('./output/' + csv_file) as f:
+        with open(csv_file) as f:
             reader = csv.DictReader(f, delimiter=',')
             for row in reader:
                 url = row['Png URL']
@@ -42,16 +43,6 @@ class Imaging(guithread.GUIThread):
         self.set_progress(0)
         self.print_to_textbox("DONE!")
         self.print_to_textbox("\n" + "#" * text_width + "\n")
-
-
-def get_filenames(path='./', suffix=".csv"):
-    filenames = os.listdir(path)
-    return [filename for filename in filenames if filename.endswith(suffix)]
-
-
-def update_combobox_list(combobox):
-    list = get_filenames(path='./output', suffix='.csv')
-    combobox['values'] = list
 
 
 def download_file(url, path='./'):

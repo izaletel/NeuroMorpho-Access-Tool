@@ -29,6 +29,13 @@ class MainWindow(QMainWindow):
     def set_progress(self, progressbar, value):
         progressbar.setValue(value)
 
+    def set_indefinite_progress(self, progressbar, indefinite):
+        if indefinite:
+            progressbar.setRange(0, 0)
+        else:
+            progressbar.setRange(0, 100)
+            progressbar.setValue(100)
+
     def set_filename(self, filebar, filename):
         filebar.setText(filename)
 
@@ -36,6 +43,23 @@ class MainWindow(QMainWindow):
         csv_files = QFileDialog.getOpenFileNames(self, 'Load CSV file', './output', '*.csv')
         string_csv_files = ",".join(csv_files[0])
         filebar.setText(string_csv_files)
+
+    def create_list_from_csv(self, csv_file):
+        if csv_file == '':
+            self.print_to_textbox(ui_window.img_textbox, "No files available")
+            return []
+        self.print_to_textbox(ui_window.img_textbox, "File is " + csv_file)
+        urls = []
+        with open(csv_file) as f:
+            reader = csv.DictReader(f, delimiter=',')
+            for row in reader:
+                url = row['Png URL']
+                if url and url != "None":
+                    try:
+                        urls.append(url)
+                    except Exception as e:
+                        self.print_to_textbox(ui_window.img_textbox, str(e))
+        return urls
 
     @Slot()
     def acquisition_thread(self, filename='default.csv', brain_region='All', species='All', cell_type='All'):
@@ -48,18 +72,35 @@ class MainWindow(QMainWindow):
     @Slot()
     def get_images_thread(self, path='./', csv_files=''):
         for csv_file in csv_files.split(','):
-            totalrows = sum(1 for _ in open(csv_file))
-            print(totalrows)
+            img_url_list = self.create_list_from_csv(csv_file)
+            if not img_url_list:
+                continue
+            img_url_list_split_number = len(img_url_list) // max_thread_count
+            csv_filename = ospath.basename(csv_file)
+            images_path = path + '/images/'
+            images_subdir = images_path + csv_filename.split('.')[0] + '/'
+            makedirs(images_subdir, exist_ok=True)
+
+            self.set_progress(ui_window.img_progressbar, 0)
+
             for i in range(0, max_thread_count):
-                self.img = Imaging(path=path, csv_file=csv_file, job_number=i)
+                if i == max_thread_count - 1:
+                    img_url_list_part = img_url_list[i * img_url_list_split_number:]
+                else:
+                    img_url_list_part = img_url_list[i * img_url_list_split_number:(i + 1) * img_url_list_split_number]
+
+                self.img = Imaging(
+                    images_path=images_subdir,
+                    img_url_list=img_url_list_part,
+                    job_number=i)
+
                 self.img.signals.text.connect(
                     lambda text: self.print_to_textbox(ui_window.img_textbox, text)
                 )
                 self.img.signals.progress.connect(
-                    lambda progress: self.set_progress(ui_window.img_progressbar, progress)
+                    lambda progress: self.set_indefinite_progress(ui_window.img_progressbar, progress)
                 )
                 self.threadpool.start(self.img)
-
 
 
 if __name__ == "__main__":

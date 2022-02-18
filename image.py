@@ -36,6 +36,7 @@ class Imaging(GUIThread):
         self.print_to_textbox("\n" + "#" * text_width + "\n")
         finishtime = datetime.datetime.now() - starttime
         print(finishtime)
+        self.signals.finished.emit(images_path)
 
 
 def download_file(url, path='./'):

@@ -52,3 +52,5 @@ about_text = "Version 1.0\n" \
              "Marko Vidakovic: mvidak@gmail.com\n"
 
 max_thread_count = 4
+
+default_file_path = './output'

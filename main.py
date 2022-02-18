@@ -9,6 +9,7 @@ from PySide6.QtCore import QThreadPool, Slot
 from qtgui import Ui_MainWindow
 
 import sys
+import os
 
 
 class MainWindow(QMainWindow):
@@ -61,16 +62,34 @@ class MainWindow(QMainWindow):
                         self.print_to_textbox(ui_window.img_textbox, str(e))
         return urls
 
+    def set_finished(self, activate_button, open_button, path):
+        activate_button.setDisabled(False)
+        open_button.setDisabled(False)
+        return path
+
+    def set_acq_finished(self, activate_button, open_button, path):
+        self.lastfilepath = self.set_finished(activate_button, open_button, path)
+
+    def set_img_finished(self, activate_button, open_button, path):
+        self.img_thread_number -= 1
+        if self.img_thread_number == 0:
+            self.lastimagepath = self.set_finished(activate_button, open_button, path)
+
     @Slot()
     def acquisition_thread(self, filename='default.csv', brain_region='All', species='All', cell_type='All'):
+        ui_window.acq_button.setDisabled(True)
         self.acq = Acquisition(filename=filename, brain_region=brain_region, species=species, cell_type=cell_type)
 
         self.acq.signals.text.connect(lambda text: self.print_to_textbox(ui_window.acq_textbox, text))
         self.acq.signals.progress.connect(lambda progress: self.set_progress(ui_window.acq_progressbar, progress))
+        self.acq.signals.finished.connect(
+            lambda path: self.set_acq_finished(ui_window.acq_button, ui_window.open_csv_file_button, path)
+        )
         self.threadpool.start(self.acq)
 
     @Slot()
     def get_images_thread(self, path='./', csv_files=''):
+        ui_window.img_button.setDisabled(True)
         for csv_file in csv_files.split(','):
             img_url_list = self.create_list_from_csv(csv_file)
             if not img_url_list:
@@ -82,6 +101,7 @@ class MainWindow(QMainWindow):
             makedirs(images_subdir, exist_ok=True)
 
             self.set_progress(ui_window.img_progressbar, 0)
+            self.img_thread_number = max_thread_count
 
             for i in range(0, max_thread_count):
                 if i == max_thread_count - 1:
@@ -99,6 +119,10 @@ class MainWindow(QMainWindow):
                 )
                 self.img.signals.progress.connect(
                     lambda progress: self.set_indefinite_progress(ui_window.img_progressbar, progress)
+                )
+                self.img.signals.finished.connect(
+                    lambda path:
+                    self.set_img_finished(ui_window.img_button, ui_window.open_images_directory_button, path)
                 )
                 self.threadpool.start(self.img)
 
@@ -147,6 +171,9 @@ if __name__ == "__main__":
             ui_window.cell_type_choice_menu.currentText())
     )
 
+    ui_window.open_csv_file_button.setDisabled(True)
+    ui_window.open_csv_file_button.clicked.connect(lambda: os.startfile(os.getcwd() + window.lastfilepath))
+
     # Image tab
 
     ui_window.img_open_csv_file_button.clicked.connect(
@@ -162,9 +189,16 @@ if __name__ == "__main__":
         )
     )
 
+    ui_window.open_images_directory_button.setDisabled(True)
+    ui_window.open_images_directory_button.clicked.connect(lambda: os.startfile(os.getcwd() + window.lastimagepath))
+
     # About tab
 
     ui_window.about_label.setText(about_text)
+
+    # Bottom part of GUI
+
+    ui_window.open_file_location_button.clicked.connect(lambda: os.startfile(os.getcwd() + default_file_path))
 
     ui_window.exit_button.clicked.connect(app.quit)
     window.show()

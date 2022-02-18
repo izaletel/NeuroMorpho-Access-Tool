@@ -5,7 +5,9 @@ import datetime
 import guithread
 
 from os import makedirs
-from config import text_width
+from config import text_width, max_thread_count
+
+#from PySide6.QtCore import QThreadPool, Slot
 
 
 class Acquisition(guithread.GUIThread):
@@ -13,6 +15,9 @@ class Acquisition(guithread.GUIThread):
 
         self.filename = filename
         self.brain_region, self.species, self.cell_type = brain_region, species, cell_type
+
+        #self.threadpool = QThreadPool()
+        #self.threadpool.setMaxThreadCount(max_thread_count)
         super().__init__()
 
     def run(self):
@@ -291,7 +296,7 @@ class Acquisition(guithread.GUIThread):
 
         final_df = neurons_id_df.join(neuron_morphometry_df)
 
-        # excess NeuronID column left when joinging two dataframes
+        # excess NeuronID column left when joining two dataframes
         final_df = final_df.drop(columns=['NeuronID'])
 
         file_name = "./output/" + self.filename
@@ -309,4 +314,5 @@ class Acquisition(guithread.GUIThread):
         self.print_to_textbox("DONE!")
         self.print_to_textbox("\n" + "#" * text_width + "\n")
         self.set_progress(0)
+        self.signals.finished.emit(file_name)
 

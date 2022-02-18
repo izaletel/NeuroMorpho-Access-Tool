@@ -3,7 +3,7 @@ from PySide6.QtCore import QRunnable, QObject, Signal
 
 class WorkerSignals(QObject):
 
-    finished = Signal()
+    finished = Signal(tuple)
     error = Signal(tuple)
     text = Signal(str)
     progress = Signal(float)

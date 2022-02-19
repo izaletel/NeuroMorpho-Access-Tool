@@ -45,11 +45,15 @@ cell_types = ['All', 'Glia', 'interneuron', 'principal cell', 'sensory']
 
 text_width = 100
 
-about_text = "Version 1.0\n" \
-             "github link: https://github.com/izaletel/NeuroMorpho-Access-Tools\n" \
-             "Maintainers: \n" \
-             "Ivan Zaletel: ivan.zaletel88@gmail.com\n" \
-             "Marko Vidakovic: mvidak@gmail.com\n"
+about_text = "  Version 1.0\n" \
+             "  github link: https://github.com/izaletel/NeuroMorpho-Access-Tools\n" \
+             "  Maintainers: \n" \
+             "  Ivan Zaletel: ivan.zaletel@med.bg.ac.rs\n" \
+             "  Marko Vidakovic: mvidak@gmail.com\n" \
+             "  \n" \
+             "  The authors of this program are not in any way affiliated with the NeuroMorpho.Org database. \n" \
+             "  For all information and inquiries concerning the NeuroMorpho.Org database please contact the \n" \
+             "  administrator at nmadmin@gmu.edu or neuromorpho@gmail.com\n"
 
 max_thread_count = 4
 

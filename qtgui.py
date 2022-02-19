@@ -101,7 +101,7 @@ class Ui_MainWindow(object):
         self.tab_about.setObjectName(u"tab_about")
         self.about_label = QLabel(self.tab_about)
         self.about_label.setObjectName(u"about_label")
-        self.about_label.setGeometry(QRect(170, 50, 471, 381))
+        self.about_label.setGeometry(QRect(0, 0, 791, 521))
         self.tabWidget.addTab(self.tab_about, "")
         self.exit_button = QPushButton(self.centralwidget)
         self.exit_button.setObjectName(u"exit_button")

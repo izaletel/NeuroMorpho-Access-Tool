@@ -5,6 +5,7 @@ import datetime
 import guithread
 import numpy as np
 import concurrent.futures
+import time
 
 from os import makedirs
 from config import text_width, max_thread_count
@@ -65,7 +66,7 @@ class Acquisition(guithread.GUIThread):
         print(str(first_page_response.request.url))
         print(first_page_response.status_code)
 
-        return first_page_response.json()['page']['totalPages']
+        return first_page_response.json()['page']['totalPages'], first_page_response.json()['page']['totalElements']
 
     def get_morphometry(self, np_array):
         morphometry = []
@@ -95,8 +96,24 @@ class Acquisition(guithread.GUIThread):
 
             self.set_progress(0)
             self.print_to_textbox(brain_region + '\n' + species + '\n' + cell_type + '\n')
-            totalPages = self.get_first_page()
+            totalPages, totalElements = self.get_first_page()
 
+            self.print_to_textbox("Getting Neurons - total elements:" + str(totalElements) +
+                                  "\nDo you want to continue?")
+            timer = 10
+            while self.is_paused and not self.is_killed:
+                time.sleep(1)
+                timer -= 1
+                self.print_to_textbox("Will continue in: " + str(timer) + " seconds")
+                if timer == 0:
+                    break
+
+            if self.is_killed:
+                self.print_to_textbox("CANCELLED!!!")
+                self.print_to_textbox("\n" + "#" * text_width + "\n")
+                self.set_progress(0)
+                return 0
+            self.print_to_textbox("Continuing...")
             df_dict = {
                 'NeuronID': list(),
                 'Neuron Name': list(),
@@ -139,6 +156,7 @@ class Acquisition(guithread.GUIThread):
                 'Reference PMID': list(),
                 'Reference DOI': list(),
                 'Physical Integrity': list()}
+
 
             self.print_to_textbox("Getting Neurons - total pages:" + str(totalPages))
             progress_step = 20.0/totalPages

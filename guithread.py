@@ -11,9 +11,19 @@ class WorkerSignals(QObject):
 
 class GUIThread(QRunnable):
     def __init__(self):
-
+        self.is_paused = False
+        self.is_killed = False
         self.signals = WorkerSignals()
         QRunnable .__init__(self)
+
+    def pause(self):
+        self.is_paused = True
+
+    def resume(self):
+        self.is_paused = False
+
+    def kill(self):
+        self.is_killed = True
 
     def print_to_textbox(self, text):
         try:

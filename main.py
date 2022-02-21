@@ -69,6 +69,8 @@ class MainWindow(QMainWindow):
 
     def set_acq_finished(self, activate_button, open_button, path):
         self.lastfilepath = self.set_finished(activate_button, open_button, path)
+        ui_window.acq_button_continue.setDisabled(True)
+        ui_window.acq_button_cancel.setDisabled(True)
 
     def set_img_finished(self, activate_button, open_button, path):
         self.img_thread_number -= 1
@@ -79,12 +81,17 @@ class MainWindow(QMainWindow):
     def acquisition_thread(self, filename='default.csv', brain_region='All', species='All', cell_type='All'):
         ui_window.acq_button.setDisabled(True)
         self.acq = Acquisition(filename=filename, brain_region=brain_region, species=species, cell_type=cell_type)
+        self.acq.is_paused = True
+        ui_window.acq_button_continue.setDisabled(False)
+        ui_window.acq_button_cancel.setDisabled(False)
 
         self.acq.signals.text.connect(lambda text: self.print_to_textbox(ui_window.acq_textbox, text))
         self.acq.signals.progress.connect(lambda progress: self.set_progress(ui_window.acq_progressbar, progress))
         self.acq.signals.finished.connect(
             lambda path: self.set_acq_finished(ui_window.acq_button, ui_window.open_csv_file_button, path)
         )
+        ui_window.acq_button_continue.clicked.connect(lambda: self.acq.resume())
+        ui_window.acq_button_cancel.clicked.connect(lambda: self.acq.kill())
         self.threadpool.start(self.acq)
 
     @Slot()

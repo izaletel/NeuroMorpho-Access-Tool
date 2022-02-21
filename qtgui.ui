@@ -284,17 +284,17 @@
      <attribute name="title">
       <string>About</string>
      </attribute>
-     <widget class="QLabel" name="about_label">
+     <widget class="QTextBrowser" name="about_label">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>0</y>
-        <width>791</width>
-        <height>521</height>
+        <x>20</x>
+        <y>150</y>
+        <width>751</width>
+        <height>371</height>
        </rect>
       </property>
-      <property name="text">
-       <string/>
+      <property name="openLinks">
+       <bool>false</bool>
       </property>
      </widget>
     </widget>

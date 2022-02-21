@@ -3,11 +3,13 @@ import pandas as pd
 import pickle
 import datetime
 import guithread
+import numpy as np
+import concurrent.futures
 
 from os import makedirs
 from config import text_width, max_thread_count
 
-#from PySide6.QtCore import QThreadPool, Slot
+from PySide6.QtCore import QThreadPool, Slot
 
 
 class Acquisition(guithread.GUIThread):
@@ -15,51 +17,47 @@ class Acquisition(guithread.GUIThread):
 
         self.filename = filename
         self.brain_region, self.species, self.cell_type = brain_region, species, cell_type
+        self.session = requests.Session()
 
-        #self.threadpool = QThreadPool()
-        #self.threadpool.setMaxThreadCount(max_thread_count)
-        super().__init__()
-
-    def run(self):
-        brain_region, species, cell_type = self.brain_region, self.species, self.cell_type
-        starttime = datetime.datetime.now()
-        s = requests.Session()
-        params_widg = {}
+        self.params_widg = {}
         if brain_region != 'All':
-            params_widg['brain_region'] = 'brain_region:' + brain_region
+            self.params_widg['brain_region'] = 'brain_region:' + brain_region
         if species != 'All':
-            params_widg['species'] = 'species:' + species
+            self.params_widg['species'] = 'species:' + species
         if cell_type != 'All':
-            params_widg['cell_type'] = 'cell_type:' + cell_type
+            self.params_widg['cell_type'] = 'cell_type:' + cell_type
 
-        self.set_progress(0)
-        self.print_to_textbox(brain_region + '\n' + species + '\n' + cell_type + '\n')
+        self.params = {}
+        self.params['page'] = 0
+        self.params['size'] = 500
 
-        params = {}
-        params['page'] = 0
-        params['size'] = 500
         fq = []
         first = 0
-        for key, value in params_widg.items():
+        for key, value in self.params_widg.items():
             if first == 0:
                 first = 1
-                params['q'] = value
+                self.params['q'] = value
             else:
                 fq.append(value)
-                params['fq'] = fq
-
-        # based on the previous criteria the url link is created and json is called
-        # in the next cell the returned info using json is transferred into a dictionary
+                self.params['fq'] = fq
 
         if brain_region == 'All' and species == 'All' and cell_type == 'All':
-            url = 'http://neuromorpho.org/api/neuron'
+            self.url = 'http://neuromorpho.org/api/neuron'
         else:
-            url = 'http://neuromorpho.org/api/neuron/select'
+            self.url = 'http://neuromorpho.org/api/neuron/select'
 
-        first_page_response = s.get(url, params=params)
+        self.threadpool = QThreadPool()
+        self.threadpool.setMaxThreadCount(max_thread_count)
+        super().__init__()
+
+    def get_first_page(self):
+        brain_region, species, cell_type = self.brain_region, self.species, self.cell_type
+        s = self.session
+
+        first_page_response = s.get(self.url, params=self.params)
 
         if first_page_response.status_code == 404 or first_page_response.status_code == 500:
-            self.print_to_textbox("Unable to get CSV! Status code: " + first_page_response.status_code)
+            self.print_to_textbox("Unable to get CSV! Status code: " + str(first_page_response.status_code))
             return 0
         elif first_page_response.json()['page'] == '500':
             self.print_to_textbox("Unable to get CSV! Status code: " + first_page_response.json()['page'])
@@ -67,7 +65,26 @@ class Acquisition(guithread.GUIThread):
         print(str(first_page_response.request.url))
         print(first_page_response.status_code)
 
-        totalPages = first_page_response.json()['page']['totalPages']
+        return first_page_response.json()['page']['totalPages']
+
+    def get_morphometry(self, np_array):
+        morphometry = []
+        for i in np_array:
+            url = "http://neuromorpho.org/api/morphometry/id/" + str(i)
+            response = self.session.get(url)
+            json_data = response.json()
+            morphometry.append(json_data)
+            self.print_to_textbox('Querying cells {} -> status code: {}'.format(str(i), response.status_code))
+        return morphometry
+
+    def run(self):
+        brain_region, species, cell_type = self.brain_region, self.species, self.cell_type
+        s = self.session
+        starttime = datetime.datetime.now()
+
+        self.set_progress(0)
+        self.print_to_textbox(brain_region + '\n' + species + '\n' + cell_type + '\n')
+        totalPages = self.get_first_page()
 
         df_dict = {
             'NeuronID': list(),
@@ -115,8 +132,8 @@ class Acquisition(guithread.GUIThread):
         self.print_to_textbox("Getting Neurons - total pages:" + str(totalPages))
         progress_step = 20.0/totalPages
         for pageNum in range(totalPages):
-            params['page'] = pageNum
-            response = s.get(url, params=params)
+            self.params['page'] = pageNum
+            response = s.get(self.url, params=self.params)
             self.print_to_textbox('Querying page {} -> status code: {}'.format(
                 pageNum, response.status_code))
             if response.status_code == 200:  # only parse successful requests
@@ -176,20 +193,22 @@ class Acquisition(guithread.GUIThread):
 
         # the ID number of previously obtained neurons is used to obtain their morphometric details
 
-        n = neurons_df['NeuronID'].to_numpy()
+        np_array = neurons_df['NeuronID'].to_numpy()
+        np_arrays = np.array_split(np_array, max_thread_count)
 
         self.print_to_textbox("Getting morphometry")
         morphometry = []
-        progress_step = 40.0 / n.size
+        progress_step = 40.0 / np_array.size
         progress_value = 0.0
-        for i in n:
-            url = "http://neuromorpho.org/api/morphometry/id/" + str(i)
-            response = s.get(url)
-            json_data = response.json()
-            morphometry.append(json_data)
-            progress_value += progress_step
-            self.set_progress(30 + progress_value)
-            self.print_to_textbox('Querying cells {} -> status code: {}'.format(str(i), response.status_code))
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_thread_count) as executor:
+            futures = []
+            for n in np_arrays:
+                futures.append(executor.submit(self.get_morphometry, np_array=n))
+            for future in concurrent.futures.as_completed(futures):
+                morphometry.extend(future.result())
+
+
+        print(morphometry)
         self.set_progress(70)
         self.print_to_textbox("Creating morphometry Data Frame")
         df_dict = {}

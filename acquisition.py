@@ -258,7 +258,7 @@ class Acquisition(guithread.GUIThread):
             df_dict['Diameter'] = []
             df_dict['Euclidian distance'] = []
             df_dict['Path distance'] = []
-            df_dict['Branching order'] = []
+            df_dict['Branch order'] = []
             df_dict['Contraction'] = []
             df_dict['Fragmentation'] = []
             df_dict['Partition asymmetry'] = []
@@ -281,7 +281,7 @@ class Acquisition(guithread.GUIThread):
                 df_dict['Diameter'].append(str(row['diameter']))
                 df_dict['Euclidian distance'].append(str(row['eucDistance']))
                 df_dict['Path distance'].append(str(row['pathDistance']))
-                df_dict['Branching order'].append(str(row['branch_Order']))
+                df_dict['Branch order'].append(str(row['branch_Order']))
                 df_dict['Contraction'].append(str(row['contraction']))
                 df_dict['Fragmentation'].append(str(row['fragmentation']))
                 df_dict['Partition asymmetry'].append(str(row['partition_asymmetry']))
@@ -321,7 +321,7 @@ class Acquisition(guithread.GUIThread):
             neurons_df["Diameter"] = pd.to_numeric(neurons_df["Diameter"], downcast="float")
             neurons_df["Euclidian distance"] = pd.to_numeric(neurons_df["Euclidian distance"], downcast="float")
             neurons_df["Path distance"] = pd.to_numeric(neurons_df["Path distance"], downcast="float")
-            neurons_df["Branching order"] = pd.to_numeric(neurons_df["Branching order"], downcast="float")
+            neurons_df["Branch order"] = pd.to_numeric(neurons_df["Branch order"], downcast="float")
             neurons_df["Contraction"] = pd.to_numeric(neurons_df["Contraction"], downcast="float")
             neurons_df["Fragmentation"] = pd.to_numeric(neurons_df["Fragmentation"], downcast="float")
             neurons_df["Partition asymmetry"] = pd.to_numeric(neurons_df["Partition asymmetry"], downcast="float")

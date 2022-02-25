@@ -18,24 +18,27 @@ brain_regions = [
 #    value='hippocampus', description='Brain Region:')
 
 species_all = [
-    'All', 'African wild dog', 'agouti', 'Apis mellifera', 'Aplysia', 'Axolotl', 'Baboon',
-    'Blind mole-rat', 'blowfly', 'Blue wildebeest', 'Bonobo', 'bottlenose dolphin', 'C. elegans',
-    'Calango lizard', 'capuchin monkey', 'Caracal', 'cat', 'cheetah', 'chicken', 'chimpanzee', 'Clam worm',
-    'clouded leopard', 'Crab', 'cricket',
-    'Crisia eburnea', 'Domestic dog', 'domestic pig', 'dragonfly', 'drosophila melanogaster',
-    'drosophila sechellia',
-    'elephant', 'ferret', 'giraffe', 'goldfish', 'grasshopper', 'Greater kudu', 'guinea pig', 'Hamster', 'human',
-    'humpback whale',
-    'Lemur', 'leopard', 'Lion', 'locust', 'manatee', 'minke whale', 'Mongoose', 'monkey', 'Mormyrid fish',
-    'moth',
-    'mouse', 'pouched lamprey', 'Praying mantis (Hierodula membranacea)',
-    'Praying mantis (Hierodula membranacea)',
-    'proechimys', 'rabbit', 'Rana esculenta', 'Ranitomeya imitator', 'rat', 'Rhinella arenarum',
-    'Ruddy turnstone', 'salamander',
-    'Scinax granulatus', 'Sea lamprey', 'Semipalmated plover', 'Semipalmated sandpiper', 'sheep', 'Silkmoth',
-    'spiny lobster', 'Stellers Sculpin',
-    'Tiger', 'Toadfish', 'Treeshrew', 'turtle', 'Wallaby', 'Xenopus laevis', 'Xenopus tropicalis', 'Zebra',
-    'zebra finch', 'zebrafish'
+    'All', 'African wild dog', 'agouti', 'Apis mellifera', 'Aplysia', 'Axolotl',
+    'Baboon', 'bat', 'Blind mole-rat', 'blowfly', 'Blue wildebeest', 'Bonobo', 'bottlenose dolphin',
+    'C. elegans', 'Calango lizard', 'capuchin monkey', 'Caracal', 'cat', 'cheetah', 'chicken', 'chimpanzee', 'Clam worm',
+    'clouded leopard', 'Crab', 'cricket', 'Crisia eburnea',
+    'Domestic dog', 'domestic pig', 'dragonfly', 'drosophila melanogaster', 'drosophila sechellia',
+    'elephant',
+    'ferret',
+    'giant anteater', 'giraffe', 'goldfish', 'Gorilla', 'grasshopper', 'Greater kudu', 'guinea pig',
+    'Hamster', 'hippopotamus', 'human', 'humpback whale',
+    'Lemur', 'leopard', 'Lion', 'locust',
+    'manatee', 'minke whale', 'Mongoose', 'monkey', 'Mormyrid fish', 'moth', 'mouse',
+    'opossum', 'Orangutan',
+    'porpoise', 'potto', 'pouched lamprey', 'Praying mantis (Hierodula membranacea)',
+    'Praying mantis (Rhombodera megaera)', 'proechimys',
+    'rabbit', 'Rana esculenta', 'Ranitomeya imitator', 'rat', 'red panda', 'Rhinella arenarum', 'Ruddy turnstone',
+    'salamander', 'Scinax granulatus', 'Sea lamprey', 'Semipalmated plover', 'Semipalmated sandpiper',
+    'sheep', 'Silkmoth', 'sloth', 'spiny lobster', 'Steller\'s Sculpin',
+    'Tiger', 'Toadfish', 'Treeshrew', 'turtle',
+    'Wallaby', 'Western tarsier',
+    'Xenopus laevis', 'Xenopus tropicalis',
+    'Zebra', 'zebra finch', 'zebrafish'
 ]
 # value='mouse', description='Animal:')
 

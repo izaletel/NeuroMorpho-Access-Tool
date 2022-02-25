@@ -10,7 +10,7 @@ import time
 from os import makedirs
 from config import text_width, max_thread_count
 
-from PySide6.QtCore import QThreadPool, Slot
+from PySide6.QtCore import QThreadPool
 
 
 class Acquisition(guithread.GUIThread):
@@ -245,7 +245,7 @@ class Acquisition(guithread.GUIThread):
             self.set_progress(70)
             self.print_to_textbox("Creating morphometry Data Frame")
             df_dict = {}
-            df_dict['Neuron ID'] = []
+            df_dict['NeuronID'] = []
             df_dict['Surface'] = []
             df_dict['Volume'] = []
             df_dict['Soma surface'] = []
@@ -268,7 +268,7 @@ class Acquisition(guithread.GUIThread):
             df_dict['Bifurcation angle remote'] = []
             df_dict['Length'] = []
             for row in morphometry:
-                df_dict['Neuron ID'].append(str(row['neuron_id']))
+                df_dict['NeuronID'].append(str(row['neuron_id']))
                 df_dict['Surface'].append(str(row['surface']))
                 df_dict['Volume'].append(str(row['volume']))
                 df_dict['Soma surface'].append(str(row['soma_Surface']))
@@ -346,10 +346,15 @@ class Acquisition(guithread.GUIThread):
             self.set_progress(90)
             self.print_to_textbox(neuron_morphometry_df)
 
-            final_df = neurons_id_df.join(neuron_morphometry_df)
+            #neurons_id_df.set_index('NeuronID', inplace=True)
+            #print("set index 1")
+            #neuron_morphometry_df.set_index('NeuronID', inplace=True)
+            print("set index 2")
+            final_df = pd.merge(neurons_id_df, neuron_morphometry_df, on='NeuronID')
+            #final_df = neurons_id_df.join(neuron_morphometry_df)
 
             # excess NeuronID column left when joining two dataframes
-            final_df = final_df.drop(columns=['NeuronID'])
+            #final_df = final_df.drop(columns=['NeuronID'])
 
             file_name = "./output/" + self.filename
 

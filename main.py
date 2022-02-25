@@ -201,7 +201,9 @@ if __name__ == "__main__":
 
     # About tab
 
-    ui_window.about_label.setText(about_text)
+    ui_window.about_label.setHtml(about_text)
+    ui_window.about_label.setOpenExternalLinks(True)
+
 
     # Bottom part of GUI
 

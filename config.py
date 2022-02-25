@@ -1,9 +1,9 @@
 brain_regions = [
     'All', 'abdominal ganglion', 'accessory lobe', 'accessory olfactory bulb',
     'adult subesophageal zone', 'amygdala', 'antenna', 'antennal lobe', 'anterior olfactory nucleus',
-    'basal forbrain', 'basal ganglia', 'brainstem', 'Central complex', 'Central nervous system',
+    'basal forebrain', 'basal ganglia', 'brainstem', 'Central complex', 'Central nervous system',
     'cerebellum', 'cerebral ganglion', 'Cochlea', 'corpus callosum', 'cortex', 'electrosensory lobe',
-    'endocrine system', 'enthorinal cortex', 'eye circuit', 'forebrain', 'fornix', 'ganglion',
+    'endocrine system', 'entorhinal cortex', 'eye circuit', 'forebrain', 'fornix', 'ganglion',
     'hippocampus', 'hypothalamus', 'lateral complex', 'lateral horn', 'lateral line organ', 'left',
     'Left Adult Central Complex', 'Left Mushroom Body', 'main olfactory bulb', 'meninges', 'mesencephalon',
     'myelencephalon', 'neocortex', 'nuchal organs', 'olfactory cortex', 'olfactory pit', 'optic lobe',

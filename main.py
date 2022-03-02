@@ -45,23 +45,6 @@ class MainWindow(QMainWindow):
         string_csv_files = ",".join(csv_files[0])
         filebar.setText(string_csv_files)
 
-    def create_list_from_csv(self, csv_file):
-        if csv_file == '':
-            self.print_to_textbox(ui_window.img_textbox, "No files available")
-            return []
-        self.print_to_textbox(ui_window.img_textbox, "File is " + csv_file)
-        urls = []
-        with open(csv_file) as f:
-            reader = csv.DictReader(f, delimiter=',')
-            for row in reader:
-                url = row['Png URL']
-                if url and url != "None":
-                    try:
-                        urls.append(url)
-                    except Exception as e:
-                        self.print_to_textbox(ui_window.img_textbox, str(e))
-        return urls
-
     def set_finished(self, activate_button, open_button, path):
         activate_button.setDisabled(False)
         open_button.setDisabled(False)
@@ -73,9 +56,7 @@ class MainWindow(QMainWindow):
         ui_window.acq_button_cancel.setDisabled(True)
 
     def set_img_finished(self, activate_button, open_button, path):
-        self.img_thread_number -= 1
-        if self.img_thread_number == 0:
-            self.lastimagepath = self.set_finished(activate_button, open_button, path)
+        self.lastimagepath = self.set_finished(activate_button, open_button, path)
 
     @Slot()
     def acquisition_thread(self, filename='default.csv', brain_region='All', species='All', cell_type='All'):
@@ -97,41 +78,18 @@ class MainWindow(QMainWindow):
     @Slot()
     def get_images_thread(self, path='./', csv_files=''):
         ui_window.img_button.setDisabled(True)
-        for csv_file in csv_files.split(','):
-            img_url_list = self.create_list_from_csv(csv_file)
-            if not img_url_list:
-                continue
-            img_url_list_split_number = len(img_url_list) // max_thread_count
-            csv_filename = ospath.basename(csv_file)
-            images_path = path + '/images/'
-            images_subdir = images_path + csv_filename.split('.')[0] + '/'
-            makedirs(images_subdir, exist_ok=True)
+        self.img = Imaging(csv_files=csv_files, path=path)
 
-            self.set_progress(ui_window.img_progressbar, 0)
-            self.img_thread_number = max_thread_count
-
-            for i in range(0, max_thread_count):
-                if i == max_thread_count - 1:
-                    img_url_list_part = img_url_list[i * img_url_list_split_number:]
-                else:
-                    img_url_list_part = img_url_list[i * img_url_list_split_number:(i + 1) * img_url_list_split_number]
-
-                self.img = Imaging(
-                    images_path=images_subdir,
-                    img_url_list=img_url_list_part,
-                    job_number=i)
-
-                self.img.signals.text.connect(
-                    lambda text: self.print_to_textbox(ui_window.img_textbox, text)
-                )
-                self.img.signals.progress.connect(
-                    lambda progress: self.set_indefinite_progress(ui_window.img_progressbar, progress)
-                )
-                self.img.signals.finished.connect(
-                    lambda path:
-                    self.set_img_finished(ui_window.img_button, ui_window.open_images_directory_button, path)
-                )
-                self.threadpool.start(self.img)
+        self.img.signals.text.connect(
+            lambda text: self.print_to_textbox(ui_window.img_textbox, text)
+        )
+        self.img.signals.progress.connect(
+            lambda progress: self.set_indefinite_progress(ui_window.img_progressbar, progress)
+        )
+        self.img.signals.finished.connect(
+            lambda path: self.set_img_finished(ui_window.img_button, ui_window.open_images_directory_button, path)
+        )
+        self.threadpool.start(self.img)
 
 
 if __name__ == "__main__":

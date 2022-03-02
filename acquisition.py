@@ -10,8 +10,6 @@ import time
 from os import makedirs
 from config import text_width, max_thread_count
 
-from PySide6.QtCore import QThreadPool
-
 
 class Acquisition(guithread.GUIThread):
     def __init__(self, filename='default.csv', brain_region='All', species='All', cell_type='All'):
@@ -46,9 +44,6 @@ class Acquisition(guithread.GUIThread):
             self.url = 'http://neuromorpho.org/api/neuron'
         else:
             self.url = 'http://neuromorpho.org/api/neuron/select'
-
-        self.threadpool = QThreadPool()
-        self.threadpool.setMaxThreadCount(max_thread_count)
         super().__init__()
 
     def get_first_page(self):

@@ -65,7 +65,6 @@ class Imaging(GUIThread):
             starttime = datetime.datetime.now()
             images_path = self.images_path
 
-            progress_step = (100.0 / max_thread_count)
             for csv, img_url_list in self.images_to_download.items():
                 img_url_lists = np.array_split(img_url_list, max_thread_count)
                 with concurrent.futures.ThreadPoolExecutor(max_workers=max_thread_count) as executor:

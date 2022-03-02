@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
             progressbar.setRange(0, 0)
         else:
             progressbar.setRange(0, 100)
-            progressbar.setValue(100)
+            progressbar.setValue(0)
 
     def set_filename(self, filebar, filename):
         filebar.setText(filename)

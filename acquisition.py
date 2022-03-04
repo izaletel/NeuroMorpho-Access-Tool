@@ -56,7 +56,7 @@ class Acquisition(guithread.GUIThread):
         if first_page_response.status_code == 404 or first_page_response.status_code == 500:
             self.print_to_textbox("Unable to get CSV! Status code: " + str(first_page_response.status_code))
             return 0
-        elif first_page_response.json()['status'] == 500:
+        elif 'status' in first_page_response.json() and first_page_response.json()['status'] == 500:
             self.print_to_textbox("Unable to get CSV! Status code: " + str(first_page_response.json()['status']))
             return 0
         print(str(first_page_response.request.url))

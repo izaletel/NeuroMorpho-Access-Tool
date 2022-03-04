@@ -48,15 +48,20 @@ cell_types = ['All', 'Glia', 'interneuron', 'principal cell', 'sensory']
 
 text_width = 100
 
-about_text = "  Version 1.0\n" \
-             "  github link: <a href=\"https://github.com/izaletel/NeuroMorpho-Access-Tools\">https://github.com/izaletel/NeuroMorpho-Access-Tools</a>\n" \
-             "  Maintainers: \n" \
-             "  Ivan Zaletel: ivan.zaletel@med.bg.ac.rs\n" \
-             "  Marko Vidakovic: mvidak@gmail.com\n" \
-             "  \n" \
-             "  The authors of this program are not in any way affiliated with the NeuroMorpho.Org database. \n" \
-             "  For all information and inquiries concerning the NeuroMorpho.Org database please contact the \n" \
-             "  administrator at nmadmin@gmu.edu or neuromorpho@gmail.com\n"
+about_text = \
+    '<h2>About</h2><p>Version 1.0</p>' \
+    '<p>github link: ' \
+    '<a href=\"https://github.com/izaletel/NeuroMorpho-Access-Tools\">' \
+    'https://github.com/izaletel/NeuroMorpho-Access-Tools</a>' \
+    '</p><p>Maintainers:<br>' \
+    'Ivan Zaletel: <a href="mailto:ivan.zaletel@med.bg.ac.rs">ivan.zaletel@med.bg.ac.rs</a><br>' \
+    'Marko Vidakovic: <a href="mailto:mvidak@gmail.com">mvidak@gmail.com</a><br>' \
+    '</p><p>' \
+    'The authors of this program are not in any way affiliated with the NeuroMorpho.Org database.<br><br>' \
+    'For all information and inquiries concerning the NeuroMorpho.Org database ' \
+    'please contact the administrator at<br> ' \
+    '<a href="mailto:nmadmin@gmu.edu">nmadmin@gmu.edu</a> ' \
+    'or <a href="mailto:neuromorpho@gmail.com">neuromorpho@gmail.com</a></p>'
 
 max_thread_count = 4
 

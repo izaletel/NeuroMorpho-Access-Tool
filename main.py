@@ -161,6 +161,7 @@ if __name__ == "__main__":
 
     ui_window.about_label.setHtml(about_text)
     ui_window.about_label.setOpenExternalLinks(True)
+    ui_window.about_label.setOpenLinks(True)
 
 
     # Bottom part of GUI

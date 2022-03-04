@@ -1,141 +1,173 @@
 # -*- coding: utf-8 -*-
 
-from tkinter import *
-from tkinter import ttk
 from acquisition import *
 from image import *
 from config import *
-from tkinter.scrolledtext import ScrolledText
+
+from PySide6.QtWidgets import QMainWindow, QApplication, QFileDialog
+from PySide6.QtCore import QThreadPool, Slot
+from qtgui import Ui_MainWindow
 
 import sys
+import os
 
-'''
-def decorator(func):
-    def inner(inputStr):
+
+class MainWindow(QMainWindow):
+
+    def __init__(self):
+        self.threadpool = QThreadPool()
+        self.threadpool.setMaxThreadCount(max_thread_count)
+        super().__init__()
+
+    def print_to_textbox(self, textbox, text):
         try:
-            text.insert(INSERT, inputStr)
-            text.see(END)
-            text.update_idletasks()
-            progressbar.update_idletasks()
-            return func(inputStr)
-        except:
-            return func(inputStr)
+            text = text + '\n'
+            print(text)
+            textbox.insertPlainText(str(text))
+        except Exception as e:
+            print(e)
 
-    return inner
+    def set_progress(self, progressbar, value):
+        progressbar.setValue(value)
 
+    def set_indefinite_progress(self, progressbar, indefinite):
+        if indefinite:
+            progressbar.setRange(0, 0)
+        else:
+            progressbar.setRange(0, 100)
+            progressbar.setValue(0)
 
-sys.stdout.write = decorator(sys.stdout.write)
-'''
+    def set_filename(self, filebar, filename):
+        filebar.setText(filename)
+
+    def get_image_csv(self, filebar):
+        csv_files = QFileDialog.getOpenFileNames(self, 'Load CSV file', './output', '*.csv')
+        string_csv_files = ",".join(csv_files[0])
+        filebar.setText(string_csv_files)
+
+    def set_finished(self, activate_button, open_button, path):
+        activate_button.setDisabled(False)
+        open_button.setDisabled(False)
+        return path
+
+    def set_acq_finished(self, activate_button, open_button, path):
+        self.lastfilepath = self.set_finished(activate_button, open_button, path)
+        ui_window.acq_button_continue.setDisabled(True)
+        ui_window.acq_button_cancel.setDisabled(True)
+
+    def set_img_finished(self, activate_button, open_button, path):
+        self.lastimagepath = self.set_finished(activate_button, open_button, path)
+
+    @Slot()
+    def acquisition_thread(self, filename='default.csv', brain_region='All', species='All', cell_type='All'):
+        ui_window.acq_button.setDisabled(True)
+        self.acq = Acquisition(filename=filename, brain_region=brain_region, species=species, cell_type=cell_type)
+        self.acq.is_paused = True
+        ui_window.acq_button_continue.setDisabled(False)
+        ui_window.acq_button_cancel.setDisabled(False)
+
+        self.acq.signals.text.connect(lambda text: self.print_to_textbox(ui_window.acq_textbox, text))
+        self.acq.signals.progress.connect(lambda progress: self.set_progress(ui_window.acq_progressbar, progress))
+        self.acq.signals.finished.connect(
+            lambda path: self.set_acq_finished(ui_window.acq_button, ui_window.open_csv_file_button, path)
+        )
+        ui_window.acq_button_continue.clicked.connect(lambda: self.acq.resume())
+        ui_window.acq_button_cancel.clicked.connect(lambda: self.acq.kill())
+        self.threadpool.start(self.acq)
+
+    @Slot()
+    def get_images_thread(self, path='./', csv_files=''):
+        ui_window.img_button.setDisabled(True)
+        self.img = Imaging(csv_files=csv_files, path=path)
+
+        self.img.signals.text.connect(
+            lambda text: self.print_to_textbox(ui_window.img_textbox, text)
+        )
+        self.img.signals.progress.connect(
+            lambda progress: self.set_indefinite_progress(ui_window.img_progressbar, progress)
+        )
+        self.img.signals.finished.connect(
+            lambda path: self.set_img_finished(ui_window.img_button, ui_window.open_images_directory_button, path)
+        )
+        self.threadpool.start(self.img)
+
 
 if __name__ == "__main__":
-    window = Tk()
-    window.title('NeuroMorpho Access Tool')
-    window.resizable(width=False, height=False)
-    # window.geometry('800x600')
+    app = QApplication(sys.argv)
+    window = MainWindow()
+    ui_window = Ui_MainWindow()
+    ui_window.setupUi(window)
 
-    tab_parent = ttk.Notebook(window)
-    tab_acquire = ttk.Frame(tab_parent)
-    tab_image = ttk.Frame(tab_parent)
-    tab_parent.add(tab_acquire, text="Generate CSV")
-    tab_parent.add(tab_image, text="Get Images")
+    # Acquire tab
+    ui_window.brain_region_menu.addItems(brain_regions)
+    ui_window.species_choice_menu.addItems(species_all)
+    ui_window.cell_type_choice_menu.addItems(cell_types)
 
-    #tab_parent.pack(expand=1, fill='both')
-    tab_parent.grid(row=0, column=0, sticky=W, pady=2)
-
-    acqframe = Frame(tab_acquire, width=400, height=200, borderwidth=1, relief=RIDGE)
-    acqframe.grid(row=0, column=0, sticky=W, pady=2)
-
-    acqbuttonframe = Frame(tab_acquire, width=400, height=200, borderwidth=1, relief=RIDGE)
-    acqbuttonframe.grid(row=1, column=0, sticky=N, pady=2)
-
-    acqtextframe = Frame(tab_acquire, width=400, height=660, borderwidth=1, relief=RIDGE)
-    acqtextframe.grid(row=2, column=0, sticky=W, pady=2)
-
-    imgframe = Frame(tab_image, width=400, height=200, borderwidth=1, relief=RIDGE)
-    imgframe.pack(fill="both", expand=True)
-
-    imgbuttonframe = Frame(tab_image, width=400, height=200, borderwidth=1, relief=RIDGE)
-    imgbuttonframe.pack(fill="both", expand=True)
-
-    imgtextframe = Frame(tab_image, width=400, height=660, borderwidth=1, relief=RIDGE)
-    imgtextframe.pack(fill="both", expand=True)
-
-    bottomframe = Frame(window, width=400, height=200, borderwidth=1, relief=RIDGE)
-    bottomframe.grid(row=2, column=0, sticky=N, pady=2)
-
-    brain_region_menu = ttk.Combobox(master=acqframe, width=20, values=brain_regions)
-    brain_region_menu.set(brain_regions[0])
-    brain_region_menu_label = Label(acqframe, text="Brain Region:")
-    brain_region_menu.grid(row=0, column=1, sticky=W, pady=2)
-    brain_region_menu_label.grid(row=0, column=0, sticky=W, pady=2)
-
-    species_choice_menu = ttk.Combobox(master=acqframe, width=20, values=species_all)
-    species_choice_menu.set(species_all[0])
-    species_choice_menu_label = Label(acqframe, text="Species:")
-    species_choice_menu.grid(row=1, column=1, sticky=W, pady=2)
-    species_choice_menu_label.grid(row=1, column=0, sticky=W, pady=2)
-
-    cell_type_choice_menu = ttk.Combobox(master=acqframe, width=20, values=cell_types)
-    cell_type_choice_menu.set(cell_types[0])
-    cell_type_choice_menu_label = Label(acqframe, text="Cell Type:")
-    cell_type_choice_menu.grid(row=2, column=1, sticky=W, pady=2)
-    cell_type_choice_menu_label.grid(row=2, column=0, sticky=W, pady=2)
-
-    progress_var = DoubleVar()
-    progress_var.set(0)
-
-    progressbar = ttk.Progressbar(
-        master=acqframe, orient=HORIZONTAL, length=400, mode='determinate', variable=progress_var)
-    progressbar_label = Label(acqframe, text="Progress")
-    progressbar.grid(row=1, column=2, sticky=W, pady=2, padx=100)
-    progressbar_label.grid(row=0, column=2, sticky=W, pady=2, padx=100)
-
-    acq_button = Button(
-        master=acqbuttonframe,
-        text="Get CSV",
-        command=lambda: acquisition_thread(
-            progressbar, progress_var, acqtextbox,
-            brain_region_menu.get(), species_choice_menu.get(), cell_type_choice_menu.get())
+    ui_window.brain_region_menu.currentTextChanged.connect(
+        lambda: window.set_filename(
+            ui_window.acq_entry,
+            'NM_' + ui_window.brain_region_menu.currentText().replace(" ", "_") + '_' +
+            ui_window.species_choice_menu.currentText().replace(" ", "_") + '_' +
+            ui_window.cell_type_choice_menu.currentText().replace(" ", "_") + '.csv'
+        )
     )
-    acq_button.pack(fill="none", expand=True)
-
-    acqtextbox = ScrolledText(acqtextframe, height=25, width=text_width)
-    acqtextbox.pack(side="left", fill="both", expand=True)
-
-    imgtextbox = ScrolledText(imgtextframe, height=25, width=text_width)
-    imgtextbox.pack(side="left", fill="both", expand=True)
-
-    os.makedirs('./output', exist_ok=True)
-
-    image_csv_choice_list = get_filenames(path='./output', suffix='.csv')
-    if not image_csv_choice_list:
-        image_csv_choice_list = ["None"]
-    image_csv_choice = ttk.Combobox(imgframe, values=image_csv_choice_list, state='readonly',
-                                    postcommand=lambda: update_combobox_list(image_csv_choice))
-    image_csv_choice_label = Label(imgframe, text="CSV file:")
-    image_csv_choice_label.pack(fill="x", expand=False, side='top')
-    image_csv_choice.set(image_csv_choice_list[0])
-    image_csv_choice.pack(fill="x", expand=True)
-
-    imgprogress_var = DoubleVar()
-    imgprogress_var.set(0)
-
-    imgprogressbar = ttk.Progressbar(
-        master=imgframe, orient=HORIZONTAL, length=400, mode='determinate', variable=imgprogress_var)
-    imgprogressbar_label = Label(imgframe, text="Progress")
-    imgprogressbar_label.pack(fill="x", expand=True)
-    imgprogressbar.pack(fill="both", expand=True)
-
-    image_button = Button(
-        master=imgbuttonframe,
-        text="Get Images",
-        command=lambda: get_images_thread(
-            imgprogressbar, imgprogress_var, imgtextbox,
-            path='./output/', csv_file=image_csv_choice.get())
+    ui_window.species_choice_menu.currentTextChanged.connect(
+        lambda: window.set_filename(
+            ui_window.acq_entry,
+            'NM_' + ui_window.brain_region_menu.currentText().replace(" ", "_") + '_' +
+            ui_window.species_choice_menu.currentText().replace(" ", "_") + '_' +
+            ui_window.cell_type_choice_menu.currentText().replace(" ", "_") + '.csv'
+        )
     )
-    image_button.pack(fill="none", expand=True)
+    ui_window.cell_type_choice_menu.currentTextChanged.connect(
+        lambda: window.set_filename(
+            ui_window.acq_entry,
+            'NM_' + ui_window.brain_region_menu.currentText().replace(" ", "_") + '_' +
+            ui_window.species_choice_menu.currentText().replace(" ", "_") + '_' +
+            ui_window.cell_type_choice_menu.currentText().replace(" ", "_") + '.csv'
+        )
+    )
 
-    exit_button = Button(bottomframe, text="Quit", command=window.destroy)
-    exit_button.pack(fill="none", expand=True)
+    ui_window.acq_button.clicked.connect(
+        lambda: window.acquisition_thread(
+            ui_window.acq_entry.text(),
+            ui_window.brain_region_menu.currentText(),
+            ui_window.species_choice_menu.currentText(),
+            ui_window.cell_type_choice_menu.currentText())
+    )
 
-    window.mainloop()
+    ui_window.open_csv_file_button.setDisabled(True)
+    ui_window.open_csv_file_button.clicked.connect(lambda: os.startfile(os.getcwd() + window.lastfilepath))
+
+    # Image tab
+
+    ui_window.img_open_csv_file_button.clicked.connect(
+        lambda: window.get_image_csv(
+            ui_window.img_csv_choice_list
+        )
+    )
+
+    ui_window.img_button.clicked.connect(
+        lambda: window.get_images_thread(
+            path='./output',
+            csv_files=ui_window.img_csv_choice_list.text()
+        )
+    )
+
+    ui_window.open_images_directory_button.setDisabled(True)
+    ui_window.open_images_directory_button.clicked.connect(lambda: os.startfile(os.getcwd() + window.lastimagepath))
+
+    # About tab
+
+    ui_window.about_label.setHtml(about_text)
+    ui_window.about_label.setOpenExternalLinks(True)
+    ui_window.about_label.setOpenLinks(True)
+
+
+    # Bottom part of GUI
+
+    ui_window.open_file_location_button.clicked.connect(lambda: os.startfile(os.getcwd() + default_file_path))
+
+    ui_window.exit_button.clicked.connect(app.quit)
+    window.show()
+    app.exec()

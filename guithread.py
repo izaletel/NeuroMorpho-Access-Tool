@@ -1,24 +1,35 @@
-import threading
-from tkinter import INSERT, END
+from PySide6.QtCore import QRunnable, QObject, Signal
 
 
-class GUIThread(threading.Thread):
-    def __init__(self, progressbar='', progress_var='', textbox=''):
+class WorkerSignals(QObject):
 
-        self.progressbar, self.progress_var, self.textbox = progressbar, progress_var, textbox
+    finished = Signal(tuple)
+    error = Signal(tuple)
+    text = Signal(str)
+    progress = Signal(float)
 
-        threading.Thread.__init__(self)
+
+class GUIThread(QRunnable):
+    def __init__(self):
+        self.is_paused = False
+        self.is_killed = False
+        self.signals = WorkerSignals()
+        QRunnable .__init__(self)
+
+    def pause(self):
+        self.is_paused = True
+
+    def resume(self):
+        self.is_paused = False
+
+    def kill(self):
+        self.is_killed = True
 
     def print_to_textbox(self, text):
         try:
-            text = text + '\n'
-            print(text)
-            self.textbox.insert(INSERT, text)
-            self.textbox.see(END)
-            self.textbox.update_idletasks()
+            self.signals.text.emit(str(text))
         except Exception as e:
             print(e)
 
     def set_progress(self, value):
-        self.progress_var.set(value)
-        self.progressbar.update_idletasks()
+        self.signals.progress.emit(value)

@@ -1,9 +1,9 @@
 brain_regions = [
     'All', 'abdominal ganglion', 'accessory lobe', 'accessory olfactory bulb',
     'adult subesophageal zone', 'amygdala', 'antenna', 'antennal lobe', 'anterior olfactory nucleus',
-    'basal forbrain', 'basal ganglia', 'brainstem', 'Central complex', 'Central nervous system',
+    'basal forebrain', 'basal ganglia', 'brainstem', 'Central complex', 'Central nervous system',
     'cerebellum', 'cerebral ganglion', 'Cochlea', 'corpus callosum', 'cortex', 'electrosensory lobe',
-    'endocrine system', 'enthorinal cortex', 'eye circuit', 'forebrain', 'fornix', 'ganglion',
+    'endocrine system', 'entorhinal cortex', 'eye circuit', 'forebrain', 'fornix', 'ganglion',
     'hippocampus', 'hypothalamus', 'lateral complex', 'lateral horn', 'lateral line organ', 'left',
     'Left Adult Central Complex', 'Left Mushroom Body', 'main olfactory bulb', 'meninges', 'mesencephalon',
     'myelencephalon', 'neocortex', 'nuchal organs', 'olfactory cortex', 'olfactory pit', 'optic lobe',
@@ -18,24 +18,27 @@ brain_regions = [
 #    value='hippocampus', description='Brain Region:')
 
 species_all = [
-    'All', 'African wild dog', 'agouti', 'Apis mellifera', 'Aplysia', 'Axolotl', 'Baboon',
-    'Blind mole-rat', 'blowfly', 'Blue wildebeest', 'Bonobo', 'bottlenose dolphin', 'C. elegans',
-    'Calango lizard', 'capuchin monkey', 'Caracal', 'cat', 'cheetah', 'chicken', 'chimpanzee', 'Clam worm',
-    'clouded leopard', 'Crab', 'cricket',
-    'Crisia eburnea', 'Domestic dog', 'domestic pig', 'dragonfly', 'drosophila melanogaster',
-    'drosophila sechellia',
-    'elephant', 'ferret', 'giraffe', 'goldfish', 'grasshopper', 'Greater kudu', 'guinea pig', 'Hamster', 'human',
-    'humpback whale',
-    'Lemur', 'leopard', 'Lion', 'locust', 'manatee', 'minke whale', 'Mongoose', 'monkey', 'Mormyrid fish',
-    'moth',
-    'mouse', 'pouched lamprey', 'Praying mantis (Hierodula membranacea)',
-    'Praying mantis (Hierodula membranacea)',
-    'proechimys', 'rabbit', 'Rana esculenta', 'Ranitomeya imitator', 'rat', 'Rhinella arenarum',
-    'Ruddy turnstone', 'salamander',
-    'Scinax granulatus', 'Sea lamprey', 'Semipalmated plover', 'Semipalmated sandpiper', 'sheep', 'Silkmoth',
-    'spiny lobster', 'Stellers Sculpin',
-    'Tiger', 'Toadfish', 'Treeshrew', 'turtle', 'Wallaby', 'Xenopus laevis', 'Xenopus tropicalis', 'Zebra',
-    'zebra finch', 'zebrafish'
+    'All', 'African wild dog', 'agouti', 'Apis mellifera', 'Aplysia', 'Axolotl',
+    'Baboon', 'bat', 'Blind mole-rat', 'blowfly', 'Blue wildebeest', 'Bonobo', 'bottlenose dolphin',
+    'C. elegans', 'Calango lizard', 'capuchin monkey', 'Caracal', 'cat', 'cheetah', 'chicken', 'chimpanzee', 'Clam worm',
+    'clouded leopard', 'Crab', 'cricket', 'Crisia eburnea',
+    'Domestic dog', 'domestic pig', 'dragonfly', 'drosophila melanogaster', 'drosophila sechellia',
+    'elephant',
+    'ferret',
+    'giant anteater', 'giraffe', 'goldfish', 'Gorilla', 'grasshopper', 'Greater kudu', 'guinea pig',
+    'Hamster', 'hippopotamus', 'human', 'humpback whale',
+    'Lemur', 'leopard', 'Lion', 'locust',
+    'manatee', 'minke whale', 'Mongoose', 'monkey', 'Mormyrid fish', 'moth', 'mouse',
+    'opossum', 'Orangutan',
+    'porpoise', 'potto', 'pouched lamprey', 'Praying mantis (Hierodula membranacea)',
+    'Praying mantis (Rhombodera megaera)', 'proechimys',
+    'rabbit', 'Rana esculenta', 'Ranitomeya imitator', 'rat', 'red panda', 'Rhinella arenarum', 'Ruddy turnstone',
+    'salamander', 'Scinax granulatus', 'Sea lamprey', 'Semipalmated plover', 'Semipalmated sandpiper',
+    'sheep', 'Silkmoth', 'sloth', 'spiny lobster', 'Steller\'s Sculpin',
+    'Tiger', 'Toadfish', 'Treeshrew', 'turtle',
+    'Wallaby', 'Western tarsier',
+    'Xenopus laevis', 'Xenopus tropicalis',
+    'Zebra', 'zebra finch', 'zebrafish'
 ]
 # value='mouse', description='Animal:')
 
@@ -44,3 +47,22 @@ cell_types = ['All', 'Glia', 'interneuron', 'principal cell', 'sensory']
 
 
 text_width = 100
+
+about_text = \
+    '<h2>About</h2><p>Version 1.0</p>' \
+    '<p>github link: ' \
+    '<a href=\"https://github.com/izaletel/NeuroMorpho-Access-Tools\">' \
+    'https://github.com/izaletel/NeuroMorpho-Access-Tools</a>' \
+    '</p><p>Maintainers:<br>' \
+    'Ivan Zaletel: <a href="mailto:ivan.zaletel@med.bg.ac.rs">ivan.zaletel@med.bg.ac.rs</a><br>' \
+    'Marko Vidakovic: <a href="mailto:mvidak@gmail.com">mvidak@gmail.com</a><br>' \
+    '</p><p>' \
+    'The authors of this program are not in any way affiliated with the NeuroMorpho.Org database.<br><br>' \
+    'For all information and inquiries concerning the NeuroMorpho.Org database ' \
+    'please contact the administrator at<br> ' \
+    '<a href="mailto:nmadmin@gmu.edu">nmadmin@gmu.edu</a> ' \
+    'or <a href="mailto:neuromorpho@gmail.com">neuromorpho@gmail.com</a></p>'
+
+max_thread_count = 4
+
+default_file_path = './output'

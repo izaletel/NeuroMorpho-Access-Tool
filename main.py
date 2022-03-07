@@ -10,6 +10,7 @@ from qtgui import Ui_MainWindow
 
 import sys
 import os
+import subprocess
 
 
 class MainWindow(QMainWindow):
@@ -137,7 +138,13 @@ if __name__ == "__main__":
     )
 
     ui_window.open_csv_file_button.setDisabled(True)
-    ui_window.open_csv_file_button.clicked.connect(lambda: os.startfile(os.getcwd() + window.lastfilepath))
+    if os.name == 'nt':
+        ui_window.open_csv_file_button.clicked.connect(lambda: os.startfile(os.getcwd() + window.lastfilepath))
+    else:
+        opener = "open" if sys.platform == "darwin" else "xdg-open"
+        ui_window.open_csv_file_button.clicked.connect(
+            lambda: subprocess.call([opener, os.getcwd() + '/' + window.lastfilepath])
+        )
 
     # Image tab
 
@@ -155,7 +162,14 @@ if __name__ == "__main__":
     )
 
     ui_window.open_images_directory_button.setDisabled(True)
-    ui_window.open_images_directory_button.clicked.connect(lambda: os.startfile(os.getcwd() + window.lastimagepath))
+    if os.name == 'nt':
+        ui_window.open_images_directory_button.clicked.connect(lambda: os.startfile(os.getcwd() + window.lastimagepath))
+    else:
+        opener = "open" if sys.platform == "darwin" else "xdg-open"
+        ui_window.open_images_directory_button.clicked.connect(
+            lambda: subprocess.call([opener, os.getcwd() + '/' + window.lastimagepath])
+        )
+
 
     # About tab
 
@@ -166,7 +180,14 @@ if __name__ == "__main__":
 
     # Bottom part of GUI
 
-    ui_window.open_file_location_button.clicked.connect(lambda: os.startfile(os.getcwd() + default_file_path))
+    if os.name == 'nt':
+        ui_window.open_file_location_button.clicked.connect(lambda: os.startfile(os.getcwd()))
+    else:
+        opener = "open" if sys.platform == "darwin" else "xdg-open"
+        ui_window.open_file_location_button.clicked.connect(
+            lambda: subprocess.call([opener, os.getcwd() + '/'])
+        )
+
 
     ui_window.exit_button.clicked.connect(app.quit)
     window.show()
